@@ -1,3 +1,6 @@
+# ===================================
+# 3. app.py (file utama untuk Streamlit)
+# ===================================
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,33 +9,48 @@ import os
 from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
-from glob import glob
-import re
-import string
-
-@st.cache_data
-def load_dataset():
-    if not os.path.exists("df_final.parquet"):
-        gdown.download("https://drive.google.com/uc?id=YOUR_FILE_ID", "df_final.parquet", quiet=False)
-    return pd.read_parquet("df_final.parquet")
 
 @st.cache_resource
-def load_model():
-    return KeyedVectors.load_word2vec_format("GoogleNews-vectors-negative3001.bin", binary=True)
+def download_and_load_data():
+    # Buat folder data
+    os.makedirs("data", exist_ok=True)
 
-@st.cache_resource
-def load_vectors():
-    files = sorted(glob("word2vec_chunk_hybrid_*.npz"))
-    return [sparse.load_npz(f).toarray() for f in files]
+    # --- GDrive URLs (replace with your real links) ---
+    parquet_url = "https://drive.google.com/uc?id=YOUR_PARQUET_FILE_ID"
+    npz_prefix = "https://drive.google.com/uc?id=YOUR_NPZ_CHUNK_ID_"
+    word2vec_url = "https://drive.google.com/uc?id=YOUR_WORD2VEC_BIN_ID"
 
-def clean_user_input(text):
-    if pd.isna(text):
-        return ""
-    text = re.sub(r"\$\([^)]*\)\$", "", text)
-    text = text.replace("\n", " ").replace("-", " ")
-    text = text.translate(str.maketrans("", "", string.punctuation))
-    text = re.sub(r"\s+", " ", text).strip().lower()
-    return text
+    # --- File paths ---
+    parquet_path = "data/df_final.parquet"
+    w2v_path = "data/GoogleNews-vectors-negative3001.bin"
+
+    # --- Download files if not exist ---
+    if not os.path.exists(parquet_path):
+        gdown.download(parquet_url, parquet_path, quiet=False)
+
+    if not os.path.exists(w2v_path):
+        gdown.download(word2vec_url, w2v_path, quiet=False)
+
+    # Load dataset
+    df = pd.read_parquet(parquet_path)
+
+    # Load Word2Vec model
+    w2v_model = KeyedVectors.load_word2vec_format(w2v_path, binary=True)
+
+    # Load multiple .npz chunks
+    chunks = []
+    for i in range(1, TOTAL_CHUNKS+1):  # <- update TOTAL_CHUNKS sesuai jumlah chunk kamu
+        chunk_id = f"{YOUR_CHUNK_ID_PREFIX}_{i:02d}"
+        chunk_path = f"data/word2vec_chunk_hybrid_{i:02d}.npz"
+        chunk_url = f"https://drive.google.com/uc?id={chunk_id}"
+
+        if not os.path.exists(chunk_path):
+            gdown.download(chunk_url, chunk_path, quiet=False)
+
+        chunks.append(sparse.load_npz(chunk_path).toarray())
+
+    return df, w2v_model, chunks
+
 
 def get_word2vec_vector(text, model):
     words = text.lower().split()
@@ -41,18 +59,16 @@ def get_word2vec_vector(text, model):
         return np.zeros(model.vector_size, dtype=np.float32)
     return np.mean(vectors, axis=0).astype(np.float32)
 
-def recommend_articles(user_title, user_keywords, user_category, df, model, chunks):
-    raw = f"{user_title.strip()} {user_keywords.replace(',', ' ').strip()} {user_category.strip()}"
-    cleaned = clean_user_input(raw)
-    query_vec = get_word2vec_vector(cleaned, model).reshape(1, -1)
+
+def recommend(df, model, chunks, user_text):
+    query_vec = get_word2vec_vector(user_text, model).reshape(1, -1)
 
     all_scores = []
     all_indexes = []
     start_idx = 0
-
     for chunk in chunks:
-        sim = cosine_similarity(query_vec, chunk).flatten()
-        all_scores.extend(sim)
+        sims = cosine_similarity(query_vec, chunk).flatten()
+        all_scores.extend(sims)
         all_indexes.extend(range(start_idx, start_idx + chunk.shape[0]))
         start_idx += chunk.shape[0]
 
@@ -60,29 +76,22 @@ def recommend_articles(user_title, user_keywords, user_category, df, model, chun
     sim_df['similarity_score'] = all_scores
     return sim_df.sort_values(by='similarity_score', ascending=False).head(10)
 
-# === Streamlit App ===
-st.set_page_config(page_title="ArXiv Article Recommender", layout="wide")
-st.title("📚 ArXiv Scientific Article Recommender")
 
-with st.spinner("🔄 Loading data and model..."):
-    df_final = load_dataset()
-    word2vec_model = load_model()
-    w2v_chunks = load_vectors()
+# ======================
+# Streamlit UI
+# ======================
+st.title("🔍 Scientific Article Recommendation System")
 
-st.markdown("### Masukkan input artikel untuk mendapatkan rekomendasi")
-user_title = st.text_input("Judul artikel")
+st.markdown("Masukkan informasi artikel yang Anda minati")
+user_title = st.text_input("Judul Artikel")
 user_keywords = st.text_input("Keyword (pisahkan dengan koma)")
-user_category = st.text_input("Kategori utama (misal: computer science)")
+user_category = st.text_input("Kategori utama (opsional)")
 
-if st.button("🔍 Cari Artikel yang Relevan"):
-    with st.spinner("🔍 Mencari artikel paling mirip..."):
-        results = recommend_articles(
-            user_title=user_title,
-            user_keywords=user_keywords,
-            user_category=user_category,
-            df=df_final,
-            model=word2vec_model,
-            chunks=w2v_chunks
-        )
-        st.success("✅ Rekomendasi ditemukan!")
-        st.dataframe(results[['title', 'authors', 'categories_clean', 'abstract', 'doi', 'similarity_score']])
+if st.button("Cari Rekomendasi"):
+    with st.spinner("🔄 Memuat data dan memproses rekomendasi..."):
+        df_final, word2vec_model, w2v_chunks = download_and_load_data()
+        combined_input = f"{user_title} {user_keywords.replace(',', ' ')} {user_category}"
+        top_10 = recommend(df_final, word2vec_model, w2v_chunks, combined_input)
+
+    st.success("✅ Rekomendasi ditemukan!")
+    st.dataframe(top_10[['title', 'authors', 'categories_clean', 'similarity_score']])
