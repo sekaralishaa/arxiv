@@ -1,0 +1,20 @@
+# Ignore dataset and large files
+*.parquet
+*.npz
+*.bin
+*.gz
+
+# Ignore virtual environment folders
+venv/
+env/
+.venv/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore Streamlit config
+.streamlit/
+
+# Ignore Jupyter Notebook checkpoints (if any)
+.ipynb_checkpoints/
