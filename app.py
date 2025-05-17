@@ -18,7 +18,7 @@ def download_and_load_data():
     # --- GDrive URLs (replace with your real links) ---
     parquet_url = "https://drive.google.com/uc?id=1l56SscV4A8yHuJ0Zi2OzEu8hY4E6-fGA"
     npz_prefix = "https://drive.google.com/uc?id=1TbkVavZtyJ0fcfMIR2UD5x0O-7c9AzHr"
-    word2vec_url = "https://drive.google.com/uc?id=YOUR_WORD2VEC_BIN_ID"
+    word2vec_url = "https://drive.google.com/uc?id=1VIqC0of1XGTTQiAKVThEyzg9vsTOzGg0"
 
     # --- File paths ---
     parquet_path = "data/df_final.parquet"
