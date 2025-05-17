@@ -16,8 +16,8 @@ def download_and_load_data():
     os.makedirs("data", exist_ok=True)
 
     # --- GDrive URLs (replace with your real links) ---
-    parquet_url = "https://drive.google.com/uc?id=YOUR_PARQUET_FILE_ID"
-    npz_prefix = "https://drive.google.com/uc?id=YOUR_NPZ_CHUNK_ID_"
+    parquet_url = "https://drive.google.com/uc?id=1l56SscV4A8yHuJ0Zi2OzEu8hY4E6-fGA"
+    npz_prefix = "https://drive.google.com/uc?id=1TbkVavZtyJ0fcfMIR2UD5x0O-7c9AzHr"
     word2vec_url = "https://drive.google.com/uc?id=YOUR_WORD2VEC_BIN_ID"
 
     # --- File paths ---
