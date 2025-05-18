@@ -1,7 +1,9 @@
-streamlit
 pandas
 numpy
+streamlit
 gensim
 scikit-learn
-scipy
+pyarrow
 gdown
+scipy    # ← tambahkan ini
+
