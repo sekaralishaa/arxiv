@@ -4,3 +4,4 @@ numpy
 gensim
 scikit-learn
 scipy
+gdown
