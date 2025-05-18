@@ -5,5 +5,4 @@ gensim
 scikit-learn
 pyarrow
 gdown
-scipy    # ← tambahkan ini
-
+scipy<1.11
