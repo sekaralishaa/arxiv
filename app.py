@@ -43,9 +43,35 @@ def download_and_load_data():
     # --- Load Word2Vec Chunks ---
     chunk_ids = [
         "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE",  # word2vec_chunk_hybrid_01.npz 
-        "1Bbbbbbb5678yyyy",  # word2vec_chunk_hybrid_02.npz
-        # dst... tambahkan ID semua file
+        "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuPeRM",  # word2vec_chunk_hybrid_02.npz 
+        "14pzNVmmuMTOfUy19gPeGWv-dsOy-Ygbn",  # word2vec_chunk_hybrid_03.npz 
+        "1VYoGMF5Qv2E9Bn20mRKM-pV61t1j58Pi",  # word2vec_chunk_hybrid_04.npz 
+	"1Qnr9IHH8LvnpTtBU2xsfmsTi5KE7nxus",  # word2vec_chunk_hybrid_05.npz 
+        "1AFb7dX8Dl1qWyYcYXnkq38PQJtx8nR5E",  # word2vec_chunk_hybrid_06.npz 
+        "1z7CJAqkEToG9uOXQVIZ7Kl7MdVFVSlto",  # word2vec_chunk_hybrid_07.npz 
+        "1rYVsRFb8lNeS0bpxTOuTDwOyYD1jSEeg",  # word2vec_chunk_hybrid_08.npz 
+	"135l1x0JTbOIM3f84CWHRh99pNj0S5VC_",  # word2vec_chunk_hybrid_09.npz 
+        "14RxEsGkkfuHxWyQ-K5ufwMzmTHHyBBdL",  # word2vec_chunk_hybrid_10.npz 
+        "1o0Mhjms9TT2t1N5AOF4FIyG0XNTn-GKY",  # word2vec_chunk_hybrid_11.npz 
+        "18rC3qMOVpW0lSf0jvhRng0cS40zRlBAi",  # word2vec_chunk_hybrid_12.npz 
+	"1SCBlEqcQmlnQ4Xh0PFfKchhj4wQHo0gD",  # word2vec_chunk_hybrid_13.npz 
+        "1WdKXBsq8hEX7i2HxueYMK1IOqgXYI2TB",  # word2vec_chunk_hybrid_14.npz 
+        "1YhBWBm5gVmOTKncrsX4mWEC4gDYE21q-",  # word2vec_chunk_hybrid_15.npz 
+        "1NhIxabx9Y73JgPix9XWA5EYLOAoPsSy4",  # word2vec_chunk_hybrid_16.npz 
+	"1Vb-KaCrRi5nODkadlQ_4HyMdkQ_zGQST",  # word2vec_chunk_hybrid_17.npz 
+        "1p78fcR7977lV32Hsnhq4bHmV-g1GGfvu",  # word2vec_chunk_hybrid_18.npz 
+        "1GkcP3HF5idKmKuR9qJoRQ6RXx9V-khUE",  # word2vec_chunk_hybrid_19.npz 
+        "1kDzJ4DLkJhpWUFf0DT4lcmwLSDG6GNlW",  # word2vec_chunk_hybrid_20.npz 
+	"1VZMw2_v4mLEZsG30Ni8Kfqc9dfNcaYFN",  # word2vec_chunk_hybrid_21.npz 
+        "1P_mACznvdZA4d8iwxSxSPksTwZLlRr13",  # word2vec_chunk_hybrid_22.npz 
+        "1FGlP7qW2KbOEAAf8ywooIyrNx4dPEMlj",  # word2vec_chunk_hybrid_23.npz 
+        "1XGvFFusoGFX1hi9XqmlQkCwHTMV0qbI3",  # word2vec_chunk_hybrid_24.npz 
+	"12LDvIZwZic_BtyeqDdNcaeuf863VSAvm",  # word2vec_chunk_hybrid_25.npz 
+        "1ivOI8mUAvHwL5ryDkxxYdG_nsSmcleW_",  # word2vec_chunk_hybrid_26.npz 
+        "1poJngaPThtWy__NauBZNiUQ5TMLaMNWr"  # word2vec_chunk_hybrid_27.npz 
+   
     ]
+
 
     chunks = []
     for i, chunk_id in enumerate(chunk_ids, start=1):
