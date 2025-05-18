@@ -1,10 +1,8 @@
+streamlit==1.32.2
 pandas
 numpy
-streamlit
-gensim
-scikit-learn
 pyarrow
-gdown
+scikit-learn
 scipy==1.10.1
-pip==24.0
-setuptools<=67.0
+gensim==4.3.2
+gdown
