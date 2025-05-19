@@ -40,7 +40,7 @@ def download_and_load_data():
     df = pd.read_parquet(parquet_path)
     try:
     	st.write("✅ Mulai load model...")
-    	w2v_model = KeyedVectors.load("data/GoogleNews-vectors-reduced.bin")
+    	w2v_model = KeyedVectors.load(w2v_path)
     	st.write("✅ Word2Vec reduced model loaded successfully")
     except Exception as e:
     	st.error(f"❌ Failed to load model: {e}")
