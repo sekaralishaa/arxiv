@@ -23,10 +23,10 @@ def download_and_load_data():
 
     # --- GDrive URLs ---
     parquet_url = "https://drive.google.com/uc?id=1l56SscV4A8yHuJ0Zi2OzEu8hY4E6-fGA"
-    word2vec_url = "https://drive.google.com/uc?id=1VIqC0of1XGTTQiAKVThEyzg9vsTOzGg0"
+    word2vec_url = "https://drive.google.com/file/d/1yE7DmhFcNlZE1Oc146rCUtb1bMNPuq6k/view?usp=sharing"
 
     parquet_path = "data/df_final.parquet"
-    w2v_path = "data/GoogleNews-vectors-negative3001.bin"
+    w2v_path = "data/GoogleNews-vectors-reduced.bin"
 
     # Download parquet
     if not os.path.exists(parquet_path):
