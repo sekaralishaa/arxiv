@@ -92,6 +92,7 @@ def download_and_load_data():
     return df, w2v_model, chunks
 
 def get_word2vec_vector(text, model):
+    st.write("🛠 get_word2vec_vector masuk")
     words = text.lower().split()
     vectors = [model[word] for word in words if word in model]
     if not vectors:
@@ -100,6 +101,7 @@ def get_word2vec_vector(text, model):
 
 
 def recommend(df, model, chunks, user_text):
+    st.write("🔎 recommend() mulai")
     query_vec = get_word2vec_vector(user_text, model).reshape(1, -1)
 
     all_scores = []
@@ -113,6 +115,9 @@ def recommend(df, model, chunks, user_text):
 
     sim_df = df.iloc[all_indexes].copy()
     sim_df['similarity_score'] = all_scores
+
+    st.write("✅ recommend selesai, returning top 10")
+
     return sim_df.sort_values(by='similarity_score', ascending=False).head(10)
 
 
@@ -127,10 +132,15 @@ user_keywords = st.text_input("Keyword (pisahkan dengan koma)")
 user_category = st.text_input("Kategori utama (opsional)")
 
 if st.button("Cari Rekomendasi"):
-    with st.spinner("🔄 Memuat data dan memproses rekomendasi..."):
-        df_final, word2vec_model, w2v_chunks = download_and_load_data()
-        combined_input = f"{user_title} {user_keywords.replace(',', ' ')} {user_category}"
-        top_10 = recommend(df_final, word2vec_model, w2v_chunks, combined_input)
+    try:
+        with st.spinner("🔄 Memuat data dan memproses rekomendasi..."):
+            st.write("🚀 Mulai ambil data dan model")
+            df_final, word2vec_model, w2v_chunks = download_and_load_data()
+            combined_input = f"{user_title} {user_keywords.replace(',', ' ')} {user_category}"
+            st.write(f"📝 Input user: {combined_input}")
+            top_10 = recommend(df_final, word2vec_model, w2v_chunks, combined_input)
 
-    st.success("✅ Rekomendasi ditemukan!")
-    st.dataframe(top_10[['title', 'authors', 'categories_clean', 'similarity_score']])
+        st.success("✅ Rekomendasi ditemukan!")
+        st.dataframe(top_10[['title', 'authors', 'categories_clean', 'similarity_score']])
+    except Exception as e:
+        st.error(f"❌ Error saat menjalankan rekomendasi: {e}")
