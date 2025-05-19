@@ -38,7 +38,8 @@ def download_and_load_data():
 
     # --- Load ---
     df = pd.read_parquet(parquet_path)
-    w2v_model = KeyedVectors.load_word2vec_format(w2v_path, binary=True)
+    w2v_model = KeyedVectors.load(w2v_path)
+
 
     # --- Load Word2Vec Chunks ---
     chunk_ids = [
