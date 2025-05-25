@@ -32,9 +32,25 @@ def download_and_load_data():
     if not os.path.exists(parquet_path):
         gdown.download(parquet_url, parquet_path, quiet=False)
 
+ #    # Download Word2Vec
+ #    if not os.path.exists(parquet_path):
+	# gdown.download(parquet_url, parquet_path, quiet=False)
+	
+    if not os.path.exists(w2v_path):
+        st.error("❌ Gagal menyimpan Parquet file dari Google Drive.")
+        raise FileNotFoundError("df_final.parquet not found after download")
+
+    # Download Word2Vec
+    # if not os.path.exists(w2v_path):
+    #     gdown.download(word2vec_url, w2v_path, quiet=False)
+	
     # Download Word2Vec
     if not os.path.exists(w2v_path):
-        gdown.download(word2vec_url, w2v_path, quiet=False)
+	gdown.download(word2vec_url, w2v_path, quiet=False)
+    if not os.path.exists(w2v_path):
+        st.error("❌ Gagal menyimpan Word2Vec file dari Google Drive.")
+        raise FileNotFoundError("GoogleNews-vectors-reduced.bin not found after download")
+
 
     # --- Load ---
     df = pd.read_parquet(parquet_path)
