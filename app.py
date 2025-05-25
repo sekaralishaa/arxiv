@@ -44,6 +44,7 @@ def download_and_load_data():
     	st.write("✅ Word2Vec reduced model loaded successfully")
     except Exception as e:
     	st.error(f"❌ Failed to load model: {e}")
+	raise
 
 
     # --- Load Word2Vec Chunks ---
@@ -88,7 +89,6 @@ def download_and_load_data():
             gdown.download(chunk_url, chunk_path, quiet=False)
 
         chunks.append(sparse.load_npz(chunk_path).toarray())
-
     return df, w2v_model, chunks
 
 def get_word2vec_vector(text, model):
