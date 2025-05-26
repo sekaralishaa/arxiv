@@ -28,7 +28,48 @@ def download_and_load_data():
         raise FileNotFoundError("Word2Vec .bin model not found in 'data/'")
 
     # === Load DataFrame dan Model ===
-    df = pd.read_parquet(parquet_path)
+    chunk_ids = [
+    "1EXY0tGjiru-brh5blqgbKz-tmgjwAb0K",  # df_final_part_01.parquet
+    "1SQwLWQQBHUDQ6IGfWt0OF6dZoDieIgQb",  # df_final_part_02.parquet
+    "1PFdf9eFoFVNbvuNiAfJfaINW2BQXlwei",  # df_final_part_03.parquet
+    "12MIYAMb4GJ3Cn-jTbKGltDUCaMKb0MpU",  # df_final_part_04.parquet
+    "1yu51GxzMXe5FEMrnKN38ZVNQZNNa-xXK",  # df_final_part_05.parquet
+    "1xTKztLxAirlM_iHMyKd0ESnOil8wWiEK",  # df_final_part_06.parquet
+    "1yCK3utIq2LmGDyEJVNDFouywjwGCd7r1",  # df_final_part_07.parquet
+    "1BO3gDGe7LySnEUVA34uDy4xpYKGJsfpO",  # df_final_part_08.parquet
+    "1gdglc8pLocVutqLOJ9gMpfKIn_eWtMwi",  # df_final_part_09.parquet
+    "1avY9N-U5r9huGhGE4gYQ75eModeNaEjs",  # df_final_part_10.parquet
+    "1qw0z9IY2QFBVBuohGNEL58cV46yIkMBu",  # df_final_part_11.parquet
+    "1wVBX8HSQMEaWVKO8FRa7Uw7DAD6t2hiJ",  # df_final_part_12.parquet
+    "1AVV6f5bu56nHdlRDEyoXTVRp27lCV6Wr",  # df_final_part_13.parquet
+    "1D4B47OAZ9CfXFTGJWApYB8DV2mx8CzdU",  # df_final_part_14.parquet
+    "1OkBf--RrWyO3qDGL5tKjkZmKz2x43gZ3",  # df_final_part_15.parquet
+    "1T2TwCui7-eMfOBhzPsywbhB6Bs_KaIh9",  # df_final_part_16.parquet
+    "15Sh_mGkNnLwJ9ioTp1NX76rU0aO_lrMd",  # df_final_part_17.parquet
+    "1ebuYe2t_GtrOVW2OOSke23c7wUI0oLML",  # df_final_part_18.parquet
+    "1GONjRb-FI0IMhyVB_NXLvL77uB5-4ejq",  # df_final_part_19.parquet
+    "1nfLzIqy-JLkZs88vPu7LuoM9XTSvQwrN",  # df_final_part_20.parquet
+    "1ugfBEyCMgvJbI6qBEaviKE0W4_lLNm4C",  # df_final_part_21.parquet
+    "1jMdb6bfpSW3aFNI6kIAbLmreYVhKRSzZ",  # df_final_part_22.parquet
+    "11w8OX2fLtvcvvW1vieketEJsZ3LRlkWI",  # df_final_part_23.parquet
+    "1oX-MkEwLil8FEGPgfxcDkOnMliWKt3bu",  # df_final_part_24.parquet
+    "1H9YdVSZteZeHjwNAWD6elVWim9Gw-yOg",  # df_final_part_25.parquet
+    "1d9xMwtFvvKgFM5T3d-z8NN4ZDyPOZVt3",  # df_final_part_26.parquet
+    "1oZWPWNroerQ6gBwm1xWuIUuKN_ong2ZR"   # df_final_part_27.parquet
+    
+    ]
+
+    chunks = []
+    for i, chunk_id in enumerate(chunk_ids, start=1):
+    chunk_path = f"data/df_final_part_{i:02d}.parquet"
+    chunk_url = f"https://drive.google.com/uc?id={chunk_id}"
+
+        if not os.path.exists(chunk_path):
+            gdown.download(chunk_url, chunk_path, quiet=False)
+
+    chunks.append(pd.read_parquet(chunk_path))
+
+    df = pd.concat(chunks, ignore_index=True)
     w2v_model = KeyedVectors.load_word2vec_format(w2v_path, binary=True)
 
     # === Load Word2Vec Chunks dari Google Drive ===
