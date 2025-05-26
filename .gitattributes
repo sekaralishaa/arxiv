@@ -1,2 +1,5 @@
 *.bin filter=lfs diff=lfs merge=lfs -text
 data/GoogleNews-vectors-reduced.bin filter=lfs diff=lfs merge=lfs -text
+data/df_final.parquet filter=lfs diff=lfs merge=lfs -text
+*.parquet filter=lfs diff=lfs merge=lfs -text
+*.npz filter=lfs diff=lfs merge=lfs -text
