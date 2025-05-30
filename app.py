@@ -11,9 +11,12 @@ from scipy import sparse
 def download_and_load_data():
     base_dir = "data/data"
 
+    # ✅ Hanya ambil 2 chunk pertama untuk uji coba
+    chunk_ids = [1, 2]
+
     # --- Load df_final chunks ---
     df_chunks = []
-    for i in range(1, 28):
+    for i in chunk_ids:
         chunk_path = os.path.join(base_dir, f"df_final_part_{i:02d}.parquet")
         if not os.path.exists(chunk_path):
             st.error(f"❌ File tidak ditemukan: {chunk_path}")
@@ -31,7 +34,7 @@ def download_and_load_data():
 
     # --- Load Word2Vec document vectors (.npz chunks) ---
     w2v_chunks = []
-    for i in range(1, 28):
+    for i in chunk_ids:
         npz_path = os.path.join(base_dir, f"word2vec_chunk_hybrid_{i:02d}.npz")
         if not os.path.exists(npz_path):
             st.error(f"❌ File tidak ditemukan: {npz_path}")
@@ -39,6 +42,40 @@ def download_and_load_data():
         w2v_chunks.append(sparse.load_npz(npz_path).toarray())
 
     return df, w2v_model, w2v_chunks
+
+
+# @st.cache_resource
+# def download_and_load_data():
+#     base_dir = "data/data"
+
+#     # --- Load df_final chunks ---
+#     df_chunks = []
+#     for i in range(1, 28):
+#         chunk_path = os.path.join(base_dir, f"df_final_part_{i:02d}.parquet")
+#         if not os.path.exists(chunk_path):
+#             st.error(f"❌ File tidak ditemukan: {chunk_path}")
+#             raise FileNotFoundError(chunk_path)
+#         df_chunks.append(pd.read_parquet(chunk_path))
+
+#     df = pd.concat(df_chunks, ignore_index=True)
+
+#     # --- Load Word2Vec model (.bin) ---
+#     w2v_path = os.path.join(base_dir, "GoogleNews-vectors-reduced.bin")
+#     if not os.path.exists(w2v_path):
+#         st.error("❌ Word2Vec .bin model tidak ditemukan.")
+#         raise FileNotFoundError(w2v_path)
+#     w2v_model = KeyedVectors.load_word2vec_format(w2v_path, binary=True)
+
+#     # --- Load Word2Vec document vectors (.npz chunks) ---
+#     w2v_chunks = []
+#     for i in range(1, 28):
+#         npz_path = os.path.join(base_dir, f"word2vec_chunk_hybrid_{i:02d}.npz")
+#         if not os.path.exists(npz_path):
+#             st.error(f"❌ File tidak ditemukan: {npz_path}")
+#             raise FileNotFoundError(npz_path)
+#         w2v_chunks.append(sparse.load_npz(npz_path).toarray())
+
+#     return df, w2v_model, w2v_chunks
 
 
 def get_word2vec_vector(text, model):
