@@ -1,0 +1,18 @@
+# File data besar
+data/data/*.parquet
+data/data/*.npz
+data/data/*.bin
+data/data/*.pkl
+data/data/*.csv
+
+# Cache dan file lingkungan
+__pycache__/
+.env
+.DS_Store
+
+# Jupyter Notebook checkpoints (kalau kamu pakai)
+.ipynb_checkpoints/
+
+# VSCode atau IDE lain
+.vscode/
+.idea/
