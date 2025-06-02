@@ -5,6 +5,8 @@ from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
 import gdown
+import zipfile
+import requests
 
 DATA_DIR = "data"
 
@@ -23,23 +25,26 @@ def download_if_not_exists(path, file_id):
         print(f"📥 Downloading {os.path.basename(path)}...")
         gdown.download(url, path, quiet=False, fuzzy=True)
 
+def download_model_from_release(url, dest_zip, dest_bin):
+    if not os.path.exists(dest_bin):
+        print("📥 Downloading Word2Vec model from GitHub Releases...")
+        response = requests.get(url)
+        with open(dest_zip, 'wb') as f:
+            f.write(response.content)
+        with zipfile.ZipFile(dest_zip, 'r') as zip_ref:
+            zip_ref.extractall(DATA_DIR)
+        print("✅ Model extracted.")
+
 def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
     zip_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.zip")
     bin_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.bin")
 
-    if not os.path.exists(bin_path):
-        print("📥 Downloading Word2Vec model from GitHub Release...")
-        import requests, zipfile, io
-        r = requests.get(MODEL_RELEASE_URL)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        z.extractall(DATA_DIR)
-    else:
-        print("📦 Word2Vec model already exists, skipping download.")
+    release_url = "https://github.com/sekaralishaa/arxiv/releases/download/v1.0/GoogleNews-vectors-reduced.zip"
+    download_model_from_release(release_url, zip_path, bin_path)
 
     print(f"📥 Loading Word2Vec model from {bin_path}")
     return KeyedVectors.load_word2vec_format(bin_path, binary=True)
-
 
 def get_vector(text, model):
     words = text.lower().split()
