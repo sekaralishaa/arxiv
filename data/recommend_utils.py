@@ -30,7 +30,7 @@ def load_model():
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"  # Gensim cari file ini secara otomatis
     
-    download_if_not_exists(kv_path, MODEL_KV_ID)
+    download_if_not_exists(kv_path, MODEL_ID)
     download_if_not_exists(npy_path, MODEL_NPY_ID)
     
     print(f"📥 Loading Word2Vec model from {kv_path}")
