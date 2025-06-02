@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
-from recommend_utils import load_model_and_data, get_recommendation
+from recommend_utils import load_model, get_recommendation
 
 app = Flask(__name__)
-df, vec_all, model = load_model_and_data()
+model = load_model()
 
 @app.route("/recommend", methods=["POST"])
 def recommend():
@@ -11,7 +11,7 @@ def recommend():
     if not query:
         return jsonify({"error": "No input"}), 400
 
-    top = get_recommendation(query, df, vec_all, model)
+    top = get_recommendation(query, model)
     return jsonify(top)
 
 if __name__ == "__main__":
