@@ -1,5 +1,5 @@
 # Abaikan folder data besar di dalam backend
-backend/data/
+data/data/
 
 # File besar lainnya di semua subfolder
 *.parquet
