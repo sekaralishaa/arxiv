@@ -11,7 +11,7 @@ if st.button("Cari Rekomendasi"):
     input_text = f"{title} {keywords.replace(',', ' ')} {category}"
     try:
         with st.spinner("⏳ Mengirim ke server..."):
-            response = requests.post("https://arxiv-backend.onrender.com", json={"query": input_text})
+            response = requests.post("https://arxiv-backend.onrender.com/recommend", json={"query": input_text})
             result = response.json()
             st.success("✅ Rekomendasi ditemukan!")
             st.dataframe(result)
