@@ -22,42 +22,36 @@ def download_if_not_exists(path, file_id):
         print(f"📥 Downloading {os.path.basename(path)}...")
         gdown.download(url, path, quiet=False)
 
-
-def load_model_and_data():
+def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
-    df_chunks, vec_chunks = [], []
-
-    for i in range(1, 28):
-        pfile = f"{DATA_DIR}/df_final_part_{i:02d}.parquet"
-        nfile = f"{DATA_DIR}/word2vec_chunk_hybrid_{i:02d}.npz"
-        download_if_not_exists(pfile, PARQUET_IDS[i - 1])
-        download_if_not_exists(nfile, NPZ_IDS[i - 1])
-        print(f"🔹 Loading {pfile} and {nfile}")
-        df_chunks.append(pd.read_parquet(pfile))
-        vec_chunks.append(sparse.load_npz(nfile).toarray())
-
-    df_final = pd.concat(df_chunks, ignore_index=True)
-    vec_all = np.vstack(vec_chunks)
-
     model_path = f"{DATA_DIR}/GoogleNews-vectors-reduced.bin"
     download_if_not_exists(model_path, MODEL_ID)
     print(f"📥 Loading Word2Vec model from {model_path}")
-    model = KeyedVectors.load_word2vec_format(model_path, binary=True)
-
-    return df_final, vec_all, model
-
+    return KeyedVectors.load_word2vec_format(model_path, binary=True)
 
 def get_vector(text, model):
     words = text.lower().split()
     vectors = [model[w] for w in words if w in model]
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
-
-def get_recommendation(text, df, vectors, model):
+def get_recommendation(text, model):
     qvec = get_vector(text, model).reshape(1, -1)
-    scores = cosine_similarity(qvec, vectors).flatten()
-    if len(scores) != len(df):
-        raise ValueError(f"❌ Score length {len(scores)} does not match DataFrame rows {len(df)}")
-    df = df.copy()
-    df['score'] = scores
-    return df.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
+    results = []
+
+    for i in range(1, 28):
+        pfile = f"{DATA_DIR}/df_final_part_{i:02d}.parquet"
+        nfile = f"{DATA_DIR}/word2vec_chunk_hybrid_{i:02d}.npz"
+        download_if_not_exists(pfile, PARQUET_IDS[i - 1])
+        download_if_not_exists(nfile, NPZ_IDS[i - 1])
+
+        df_chunk = pd.read_parquet(pfile)
+        vec_chunk = sparse.load_npz(nfile).toarray()
+
+        scores = cosine_similarity(qvec, vec_chunk).flatten()
+        df_chunk = df_chunk.copy()
+        df_chunk['score'] = scores
+        top = df_chunk.sort_values(by='score', ascending=False).head(10)
+        results.append(top)
+
+    df_all = pd.concat(results, ignore_index=True)
+    return df_all.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
