@@ -15,6 +15,9 @@ NPZ_IDS = [ "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE", "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuP
 
 MODEL_ID = "1Mzvz1nApC8T5-YRmHoXU1OkdS29woyPm"
 
+MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"  # ID untuk .kv.vectors.npy
+
+
 def download_if_not_exists(path, file_id):
     if not os.path.exists(path):
         url = f"https://drive.google.com/uc?id={file_id}"
@@ -23,10 +26,15 @@ def download_if_not_exists(path, file_id):
 
 def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
-    model_path = f"{DATA_DIR}/GoogleNews-vectors-reduced.kv"
-    download_if_not_exists(model_path, MODEL_ID)
-    print(f"📥 Loading Word2Vec model from {model_path}")
-    return KeyedVectors.load(model_path)
+    
+    kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
+    npy_path = kv_path + ".vectors.npy"  # Gensim cari file ini secara otomatis
+    
+    download_if_not_exists(kv_path, MODEL_KV_ID)
+    download_if_not_exists(npy_path, MODEL_NPY_ID)
+    
+    print(f"📥 Loading Word2Vec model from {kv_path}")
+    return KeyedVectors.load(kv_path)
 
 def get_vector(text, model):
     words = text.lower().split()
