@@ -26,7 +26,7 @@ def load_model():
     model_path = f"{DATA_DIR}/GoogleNews-vectors-reduced.kv"
     download_if_not_exists(model_path, MODEL_ID)
     print(f"📥 Loading Word2Vec model from {model_path}")
-    return KeyedVectors.load(model_path, binary=True)
+    return KeyedVectors.load(model_path)
 
 def get_vector(text, model):
     words = text.lower().split()
