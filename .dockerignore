@@ -1,0 +1,14 @@
+# Abaikan folder data besar di dalam backend
+backend/data/
+
+# File besar lainnya di semua subfolder
+*.parquet
+*.npz
+*.bin
+*.pkl
+*.csv
+
+# Folder tidak penting
+__pycache__/
+.env
+.DS_Store
