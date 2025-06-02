@@ -13,7 +13,8 @@ PARQUET_IDS = [ "1EXY0tGjiru-brh5blqgbKz-tmgjwAb0K", "1SQwLWQQBHUDQ6IGfWt0OF6dZo
 
 NPZ_IDS = [ "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE", "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuPeRM", "14pzNVmmuMTOfUy19gPeGWv-dsOy-Ygbn", "1VYoGMF5Qv2E9Bn20mRKM-pV61t1j58Pi", "1Qnr9IHH8LvnpTtBU2xsfmsTi5KE7nxus", "1AFb7dX8Dl1qWyYcYXnkq38PQJtx8nR5E", "1z7CJAqkEToG9uOXQVIZ7Kl7MdVFVSlto", "1rYVsRFb8lNeS0bpxTOuTDwOyYD1jSEeg", "135l1x0JTbOIM3f84CWHRh99pNj0S5VC_", "14RxEsGkkfuHxWyQ-K5ufwMzmTHHyBBdL", "1o0Mhjms9TT2t1N5AOF4FIyG0XNTn-GKY", "18rC3qMOVpW0lSf0jvhRng0cS40zRlBAi", "1SCBlEqcQmlnQ4Xh0PFfKchhj4wQHo0gD", "1WdKXBsq8hEX7i2HxueYMK1IOqgXYI2TB", "1YhBWBm5gVmOTKncrsX4mWEC4gDYE21q-", "1NhIxabx9Y73JgPix9XWA5EYLOAoPsSy4", "1Vb-KaCrRi5nODkadlQ_4HyMdkQ_zGQST", "1p78fcR7977lV32Hsnhq4bHmV-g1GGfvu", "1GkcP3HF5idKmKuR9qJoRQ6RXx9V-khUE", "1kDzJ4DLkJhpWUFf0DT4lcmwLSDG6GNlW", "1VZMw2_v4mLEZsG30Ni8Kfqc9dfNcaYFN", "1P_mACznvdZA4d8iwxSxSPksTwZLlRr13", "1FGlP7qW2KbOEAAf8ywooIyrNx4dPEMlj", "1XGvFFusoGFX1hi9XqmlQkCwHTMV0qbI3", "12LDvIZwZic_BtyeqDdNcaeuf863VSAvm", "1ivOI8mUAvHwL5ryDkxxYdG_nsSmcleW_", "1poJngaPThtWy__NauBZNiUQ5TMLaMNWr" ]
 
-MODEL_ID = "1yE7DmhFcNlZE1Oc146rCUtb1bMNPuq6k"
+MODEL_RELEASE_URL = "https://github.com/sekaralishaa/arxiv/releases/download/v1.0/GoogleNews-vectors-reduced.zip"
+
 
 
 def download_if_not_exists(path, file_id):
@@ -24,10 +25,21 @@ def download_if_not_exists(path, file_id):
 
 def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
-    model_path = f"{DATA_DIR}/GoogleNews-vectors-reduced.bin"
-    download_if_not_exists(model_path, MODEL_ID)
-    print(f"📥 Loading Word2Vec model from {model_path}")
-    return KeyedVectors.load_word2vec_format(model_path, binary=True)
+    zip_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.zip")
+    bin_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.bin")
+
+    if not os.path.exists(bin_path):
+        print("📥 Downloading Word2Vec model from GitHub Release...")
+        import requests, zipfile, io
+        r = requests.get(MODEL_RELEASE_URL)
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z.extractall(DATA_DIR)
+    else:
+        print("📦 Word2Vec model already exists, skipping download.")
+
+    print(f"📥 Loading Word2Vec model from {bin_path}")
+    return KeyedVectors.load_word2vec_format(bin_path, binary=True)
+
 
 def get_vector(text, model):
     words = text.lower().split()
