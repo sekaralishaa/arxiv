@@ -2,11 +2,10 @@ services:
   - type: web
     name: frontend
     env: docker
-    plan: starter  # atau "professional" kalau kamu pakai yang premium
-    repo: https://github.com/sekaralishaa/arxiv
+    plan: professional  # kamu pilih plan premium
     dockerfilePath: frontend/Dockerfile
     buildCommand: ""
-    startCommand: "streamlit run app.py --server.port=10000 --server.address=0.0.0.0"
+    startCommand: streamlit run app.py --server.port=10000 --server.address=0.0.0.0
     envVars:
       - key: BACKEND_URL
         value: http://backend:5000
@@ -14,9 +13,9 @@ services:
   - type: web
     name: backend
     env: docker
-    plan: starter  # atau "professional"
-    repo: https://github.com/sekaralishaa/arxiv
+    plan: professional
     dockerfilePath: data/Dockerfile
     buildCommand: ""
-    startCommand: "python main.py"
+    startCommand: python main.py
     envVars: []
+
