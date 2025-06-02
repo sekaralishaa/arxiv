@@ -20,7 +20,7 @@ def download_if_not_exists(path, file_id):
     if not os.path.exists(path):
         url = f"https://drive.google.com/uc?id={file_id}"
         print(f"📥 Downloading {os.path.basename(path)}...")
-        gdown.download(url, path, quiet=False)
+        gdown.download(url, path, quiet=False, fuzzy=True)
 
 def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
