@@ -12,6 +12,8 @@ if st.button("Cari Rekomendasi"):
     try:
         with st.spinner("⏳ Mengirim ke server..."):
             response = requests.post("https://arxiv-backend.onrender.com/recommend", json={"query": input_text})
+            st.write("Status Code:", response.status_code)
+            st.write("Response Text:", response.text)
             result = response.json()
             st.success("✅ Rekomendasi ditemukan!")
             st.dataframe(result)
