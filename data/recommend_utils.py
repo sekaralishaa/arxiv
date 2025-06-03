@@ -6,11 +6,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
 import gdown
 import requests
+from tqdm import tqdm
 
 DATA_DIR = "data"
 GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.1"
 
-# Google Drive IDs
+# Google Drive IDs untuk file .npz
 NPZ_IDS = [ 
     "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE", "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuPeRM", 
     "14pzNVmmuMTOfUy19gPeGWv-dsOy-Ygbn", "1VYoGMF5Qv2E9Bn20mRKM-pV61t1j58Pi",
@@ -32,20 +33,38 @@ MODEL_ID = "1Mzvz1nApC8T5-YRmHoXU1OkdS29woyPm"
 MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"
 
 def download_if_not_exists(path, source):
-    if not os.path.exists(path):
-        print(f"📥 Downloading {os.path.basename(path)}...")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    if os.path.exists(path) and os.path.getsize(path) >= 1000:
+        print(f"✅ File already exists: {path}")
+        return
+
+    print(f"📥 Downloading {os.path.basename(path)} from: {source}")
+
+    try:
         if source.startswith("http"):
-            r = requests.get(source)
-            with open(path, "wb") as f:
-                f.write(r.content)
+            response = requests.get(source, stream=True)
+            if response.status_code == 200:
+                with open(path, "wb") as f:
+                    for chunk in tqdm(response.iter_content(chunk_size=8192), desc="⬇️  Saving", unit="KB"):
+                        if chunk:
+                            f.write(chunk)
+            else:
+                raise ValueError(f"❌ Failed to download: {source} (Status {response.status_code})")
         else:
             gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
 
-    if os.path.exists(path) and os.path.getsize(path) < 1000:
-        raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
+        if os.path.getsize(path) < 1000:
+            raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
+
+        print(f"✅ Download complete: {path}")
+
+    except Exception as e:
+        if os.path.exists(path):
+            os.remove(path)
+        raise RuntimeError(f"❌ Error downloading {source} -> {path}: {e}")
 
 def load_model():
-    os.makedirs(DATA_DIR, exist_ok=True)
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"
     download_if_not_exists(kv_path, MODEL_ID)
@@ -66,11 +85,10 @@ def get_recommendation(text, model):
         parquet_filename = f"df_final_part_{i:02d}.parquet"
         parquet_path = os.path.join(DATA_DIR, parquet_filename)
         parquet_url = f"{GITHUB_BASE}/{parquet_filename}"
+        download_if_not_exists(parquet_path, parquet_url)
 
         npz_filename = f"word2vec_chunk_hybrid_{i:02d}.npz"
         npz_path = os.path.join(DATA_DIR, npz_filename)
-
-        download_if_not_exists(parquet_path, parquet_url)
         download_if_not_exists(npz_path, NPZ_IDS[i - 1])
 
         df_chunk = pd.read_parquet(parquet_path)
