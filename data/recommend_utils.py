@@ -18,11 +18,17 @@ MODEL_ID = "1Mzvz1nApC8T5-YRmHoXU1OkdS29woyPm"
 MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"  # ID untuk .kv.vectors.npy
 
 
+
 def download_if_not_exists(path, file_id):
     if not os.path.exists(path):
         url = f"https://drive.google.com/uc?id={file_id}"
         print(f"📥 Downloading {os.path.basename(path)}...")
         gdown.download(url, path, quiet=False)
+    
+    # Cek ukuran file minimal 1 KB
+    if os.path.exists(path) and os.path.getsize(path) < 1000:
+        raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
+
 
 def load_model():
     os.makedirs(DATA_DIR, exist_ok=True)
