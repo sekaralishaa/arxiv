@@ -94,6 +94,10 @@ def get_recommendation(text, model):
         df_chunk = pd.read_parquet(parquet_path)
         vec_chunk = sparse.load_npz(npz_path).toarray()
 
+        # ✅ Tambahkan pengecekan kecocokan
+        if vec_chunk.shape[0] != df_chunk.shape[0]:
+            raise ValueError(f"❌ Mismatch: {npz_filename} has {vec_chunk.shape[0]} vectors, but {parquet_filename} has {df_chunk.shape[0]} rows")
+
         scores = cosine_similarity(qvec, vec_chunk).flatten()
         df_chunk = df_chunk.copy()
         df_chunk["score"] = scores
