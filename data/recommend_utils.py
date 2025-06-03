@@ -9,7 +9,7 @@ import requests
 from tqdm import tqdm
 
 DATA_DIR = "data"
-GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.1"
+GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.3"
 
 # Google Drive IDs untuk file .npz
 NPZ_IDS = [ 
