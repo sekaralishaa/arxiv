@@ -8,7 +8,7 @@ import gdown
 import requests
 
 DATA_DIR = "data"
-GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.1"
+GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/tag/v1.1"
 
 # Google Drive IDs
 NPZ_IDS = [ 
