@@ -7,6 +7,8 @@ from scipy import sparse
 import gdown
 import requests
 from tqdm import tqdm
+import gc 
+
 
 DATA_DIR = "data"
 GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.3"
@@ -77,9 +79,11 @@ def get_vector(text, model):
     vectors = [model[w] for w in words if w in model]
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
+import gc  # Tambahkan untuk kontrol memori
+
 def get_recommendation(text, model):
     qvec = get_vector(text, model).reshape(1, -1)
-    results = []
+    all_top_chunks = []
 
     for i in range(1, 28):
         parquet_filename = f"df_final_part_{i:02d}.parquet"
@@ -91,18 +95,23 @@ def get_recommendation(text, model):
         npz_path = os.path.join(DATA_DIR, npz_filename)
         download_if_not_exists(npz_path, NPZ_IDS[i - 1])
 
+        # Load sekali per chunk, lalu hapus
         df_chunk = pd.read_parquet(parquet_path)
         vec_chunk = sparse.load_npz(npz_path).toarray()
 
-        # ✅ Tambahkan pengecekan kecocokan
         if vec_chunk.shape[0] != df_chunk.shape[0]:
             raise ValueError(f"❌ Mismatch: {npz_filename} has {vec_chunk.shape[0]} vectors, but {parquet_filename} has {df_chunk.shape[0]} rows")
 
         scores = cosine_similarity(qvec, vec_chunk).flatten()
-        df_chunk = df_chunk.copy()
         df_chunk["score"] = scores
-        top = df_chunk.sort_values(by="score", ascending=False).head(10)
-        results.append(top)
+        top_chunk = df_chunk.sort_values(by="score", ascending=False).head(3)
+        all_top_chunks.append(top_chunk)
 
-    df_all = pd.concat(results, ignore_index=True)
+        # 🔥 Hapus data besar agar tidak menumpuk
+        del df_chunk, vec_chunk, scores, top_chunk
+        gc.collect()
+
+    # Sekarang hanya memproses Top-81
+    df_all = pd.concat(all_top_chunks, ignore_index=True)
     return df_all.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
+
