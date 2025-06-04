@@ -4,18 +4,16 @@ import pandas as pd
 from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
+import heapq
 import gdown
 import requests
 from tqdm import tqdm
-import gc 
-
 
 DATA_DIR = "data"
 GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.3"
 
-# Google Drive IDs untuk file .npz
-NPZ_IDS = [ 
-    "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE", "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuPeRM", 
+NPZ_IDS = [
+    "19cn1jpODxFgv1VT6enXI-gF3t4pDTteE", "17Vhxw4ErpRDE_rDZYQHNT8BqU0VuPeRM",
     "14pzNVmmuMTOfUy19gPeGWv-dsOy-Ygbn", "1VYoGMF5Qv2E9Bn20mRKM-pV61t1j58Pi",
     "1Qnr9IHH8LvnpTtBU2xsfmsTi5KE7nxus", "1AFb7dX8Dl1qWyYcYXnkq38PQJtx8nR5E",
     "1z7CJAqkEToG9uOXQVIZ7Kl7MdVFVSlto", "1rYVsRFb8lNeS0bpxTOuTDwOyYD1jSEeg",
@@ -34,56 +32,39 @@ NPZ_IDS = [
 MODEL_ID = "1Mzvz1nApC8T5-YRmHoXU1OkdS29woyPm"
 MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"
 
+
 def download_if_not_exists(path, source):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-
     if os.path.exists(path) and os.path.getsize(path) >= 1000:
-        print(f"✅ File already exists: {path}")
         return
 
-    print(f"📥 Downloading {os.path.basename(path)} from: {source}")
+    if source.startswith("http"):
+        response = requests.get(source, stream=True)
+        with open(path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+    else:
+        gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
 
-    try:
-        if source.startswith("http"):
-            response = requests.get(source, stream=True)
-            if response.status_code == 200:
-                with open(path, "wb") as f:
-                    for chunk in tqdm(response.iter_content(chunk_size=8192), desc="⬇️  Saving", unit="KB"):
-                        if chunk:
-                            f.write(chunk)
-            else:
-                raise ValueError(f"❌ Failed to download: {source} (Status {response.status_code})")
-        else:
-            gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
-
-        if os.path.getsize(path) < 1000:
-            raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
-
-        print(f"✅ Download complete: {path}")
-
-    except Exception as e:
-        if os.path.exists(path):
-            os.remove(path)
-        raise RuntimeError(f"❌ Error downloading {source} -> {path}: {e}")
 
 def load_model():
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"
     download_if_not_exists(kv_path, MODEL_ID)
     download_if_not_exists(npy_path, MODEL_NPY_ID)
-    print(f"📥 Loading Word2Vec model from {kv_path}")
     return KeyedVectors.load(kv_path)
+
 
 def get_vector(text, model):
     words = text.lower().split()
     vectors = [model[w] for w in words if w in model]
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
-import gc  # Tambahkan untuk kontrol memori
 
 def get_recommendation(text, model):
     qvec = get_vector(text, model).reshape(1, -1)
-    all_top_chunks = []
+    top_k = []  # min-heap (score, row)
 
     for i in range(1, 28):
         parquet_filename = f"df_final_part_{i:02d}.parquet"
@@ -95,23 +76,17 @@ def get_recommendation(text, model):
         npz_path = os.path.join(DATA_DIR, npz_filename)
         download_if_not_exists(npz_path, NPZ_IDS[i - 1])
 
-        # Load sekali per chunk, lalu hapus
         df_chunk = pd.read_parquet(parquet_path)
-        vec_chunk = sparse.load_npz(npz_path).toarray()
+        vec_chunk = sparse.load_npz(npz_path)
 
-        if vec_chunk.shape[0] != df_chunk.shape[0]:
-            raise ValueError(f"❌ Mismatch: {npz_filename} has {vec_chunk.shape[0]} vectors, but {parquet_filename} has {df_chunk.shape[0]} rows")
+        for idx in range(vec_chunk.shape[0]):
+            score = cosine_similarity(qvec, vec_chunk[idx]).flatten()[0]
+            row = df_chunk.iloc[idx].to_dict()
+            row["score"] = score
 
-        scores = cosine_similarity(qvec, vec_chunk).flatten()
-        df_chunk["score"] = scores
-        top_chunk = df_chunk.sort_values(by="score", ascending=False).head(3)
-        all_top_chunks.append(top_chunk)
+            if len(top_k) < 10:
+                heapq.heappush(top_k, (score, row))
+            else:
+                heapq.heappushpop(top_k, (score, row))
 
-        # 🔥 Hapus data besar agar tidak menumpuk
-        del df_chunk, vec_chunk, scores, top_chunk
-        gc.collect()
-
-    # Sekarang hanya memproses Top-81
-    df_all = pd.concat(all_top_chunks, ignore_index=True)
-    return df_all.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
-
+    return sorted([item for _, item in top_k], key=lambda x: x["score"], reverse=True)
