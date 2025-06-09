@@ -11,11 +11,16 @@ if st.button("Cari Rekomendasi"):
     input_text = f"{title} {keywords.replace(',', ' ')} {category}"
     try:
         with st.spinner("⏳ Mengirim ke server..."):
-            response = requests.post("https://arxiv-backend.onrender.com/recommend", json={"query": input_text})
-            st.write("Status Code:", response.status_code)
-            st.write("Response Text:", response.text)
+            response = requests.post("http://31.97.187.177:5000/recommend", json={"query": input_text})
+            
+        if response.ok:
             result = response.json()
             st.success("✅ Rekomendasi ditemukan!")
             st.dataframe(result)
+            st.caption(f"Status: {response.status_code}")
+        else:
+            st.error(f"❌ Gagal mengambil rekomendasi (status {response.status_code})")
+            st.text(response.text)
+
     except Exception as e:
         st.error(f"❌ Error: {e}")
