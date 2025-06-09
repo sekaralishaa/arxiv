@@ -1,14 +1,15 @@
-# Abaikan folder data besar di dalam backend
+# Hindari data besar agar tidak ikut build Docker image
 data/data/
 
-# File besar lainnya di semua subfolder
 *.parquet
 *.npz
 *.bin
 *.pkl
 *.csv
 
-# Folder tidak penting
+# Cache & file lokal
 __pycache__/
 .env
 .DS_Store
+.ipynb_checkpoints/
+.vscode/
