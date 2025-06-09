@@ -34,59 +34,55 @@ MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"
 
 
 def download_if_not_exists(path, source):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    if os.path.exists(path) and os.path.getsize(path) >= 1000:
-        return
+    if not os.path.exists(path):
+        print(f"📥 Downloading {os.path.basename(path)}...")
+        if source.startswith("http"):
+            r = requests.get(source)
+            with open(path, "wb") as f:
+                f.write(r.content)
+        else:
+            gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
 
-    if source.startswith("http"):
-        response = requests.get(source, stream=True)
-        with open(path, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-    else:
-        gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
-
+    if os.path.exists(path) and os.path.getsize(path) < 1000:
+        raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
 
 def load_model():
+    os.makedirs(DATA_DIR, exist_ok=True)
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"
     download_if_not_exists(kv_path, MODEL_ID)
     download_if_not_exists(npy_path, MODEL_NPY_ID)
+    print(f"📥 Loading Word2Vec model from {kv_path}")
     return KeyedVectors.load(kv_path)
-
 
 def get_vector(text, model):
     words = text.lower().split()
     vectors = [model[w] for w in words if w in model]
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
-
 def get_recommendation(text, model):
     qvec = get_vector(text, model).reshape(1, -1)
-    top_k = []  # min-heap (score, row)
+    results = []
 
     for i in range(1, 28):
         parquet_filename = f"df_final_part_{i:02d}.parquet"
         parquet_path = os.path.join(DATA_DIR, parquet_filename)
         parquet_url = f"{GITHUB_BASE}/{parquet_filename}"
-        download_if_not_exists(parquet_path, parquet_url)
 
         npz_filename = f"word2vec_chunk_hybrid_{i:02d}.npz"
         npz_path = os.path.join(DATA_DIR, npz_filename)
+
+        download_if_not_exists(parquet_path, parquet_url)
         download_if_not_exists(npz_path, NPZ_IDS[i - 1])
 
         df_chunk = pd.read_parquet(parquet_path)
-        vec_chunk = sparse.load_npz(npz_path)
+        vec_chunk = sparse.load_npz(npz_path).toarray()
 
-        for idx in range(vec_chunk.shape[0]):
-            score = cosine_similarity(qvec, vec_chunk[idx]).flatten()[0]
-            row = df_chunk.iloc[idx].to_dict()
-            row["score"] = score
+        scores = cosine_similarity(qvec, vec_chunk).flatten()
+        df_chunk = df_chunk.copy()
+        df_chunk["score"] = scores
+        top = df_chunk.sort_values(by="score", ascending=False).head(10)
+        results.append(top)
 
-            if len(top_k) < 10:
-                heapq.heappush(top_k, (score, row))
-            else:
-                heapq.heappushpop(top_k, (score, row))
-
-    return sorted([item for _, item in top_k], key=lambda x: x["score"], reverse=True)
+    df_all = pd.concat(results, ignore_index=True)
+    return df_all.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
