@@ -11,7 +11,7 @@ if st.button("Cari Rekomendasi"):
     input_text = f"{title} {keywords.replace(',', ' ')} {category}"
     try:
         with st.spinner("⏳ Mengirim ke server..."):
-            response = requests.post("http://31.97.187.177:5000/recommend", json={"query": input_text})
+            response = requests.post("http://localhost:5000/recommend", json={"query": input_text})
             
         if response.ok:
             result = response.json()
