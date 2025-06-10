@@ -7,7 +7,6 @@ from scipy import sparse
 import heapq
 import gdown
 import requests
-from tqdm import tqdm
 
 DATA_DIR = "data"
 GITHUB_BASE = "https://github.com/sekaralishaa/arxiv/releases/download/v1.3"
@@ -32,27 +31,23 @@ NPZ_IDS = [
 MODEL_ID = "1Mzvz1nApC8T5-YRmHoXU1OkdS29woyPm"
 MODEL_NPY_ID = "1Wq_J3AD8HLirsJE8ew0ehlMCLMTfMjXZ"
 
-
-def download_if_not_exists(path, source):
-    if not os.path.exists(path):
-        print(f"📥 Downloading {os.path.basename(path)}...")
-        if source.startswith("http"):
-            r = requests.get(source)
-            with open(path, "wb") as f:
-                f.write(r.content)
-        else:
-            gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
-
-    if os.path.exists(path) and os.path.getsize(path) < 1000:
-        raise ValueError(f"⚠️ File corrupt or incomplete: {path}")
+def download_always(path, source):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    print(f"📥 Force downloading: {os.path.basename(path)}")
+    
+    if source.startswith("http"):
+        r = requests.get(source)
+        with open(path, "wb") as f:
+            f.write(r.content)
+    else:
+        gdown.download(f"https://drive.google.com/uc?id={source}", path, quiet=False)
 
 def load_model():
-    os.makedirs(DATA_DIR, exist_ok=True)
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"
-    download_if_not_exists(kv_path, MODEL_ID)
-    download_if_not_exists(npy_path, MODEL_NPY_ID)
-    print(f"📥 Loading Word2Vec model from {kv_path}")
+    download_always(kv_path, MODEL_ID)
+    download_always(npy_path, MODEL_NPY_ID)
+    print(f"✅ Loading Word2Vec model from {kv_path}")
     return KeyedVectors.load(kv_path)
 
 def get_vector(text, model):
@@ -72,8 +67,8 @@ def get_recommendation(text, model):
         npz_filename = f"word2vec_chunk_hybrid_{i:02d}.npz"
         npz_path = os.path.join(DATA_DIR, npz_filename)
 
-        download_if_not_exists(parquet_path, parquet_url)
-        download_if_not_exists(npz_path, NPZ_IDS[i - 1])
+        download_always(parquet_path, parquet_url)
+        download_always(npz_path, NPZ_IDS[i - 1])
 
         df_chunk = pd.read_parquet(parquet_path)
         vec_chunk = sparse.load_npz(npz_path).toarray()
