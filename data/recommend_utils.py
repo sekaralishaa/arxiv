@@ -23,26 +23,30 @@ def get_vector(text, model):
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
 def get_recommendation(text, model):
-    qvec = get_vector(text, model).reshape(1, -1)
-    results = []
+    qvec_dense = get_vector(text, model).reshape(1, -1)
+    qvec_sparse = sparse.csr_matrix(qvec_dense)  # Ubah query ke sparse
+    top_results = []
 
     for i in range(1, 28):
         parquet_path = os.path.join(DATA_DIR, f"df_final_part_{i:02d}.parquet")
         npz_path = os.path.join(DATA_DIR, f"word2vec_chunk_hybrid_{i:02d}.npz")
 
-        # Validasi file sudah ada
         if not os.path.exists(parquet_path) or not os.path.exists(npz_path):
-            print(f"⚠️ Melewati chunk {i:02d}, file tidak ditemukan.")
+            print(f"⚠ Melewati chunk {i:02d}, file tidak ditemukan.")
             continue
 
         df_chunk = pd.read_parquet(parquet_path)
-        vec_chunk = sparse.load_npz(npz_path).toarray()
+        vec_chunk = sparse.load_npz(npz_path)  # tetap dalam bentuk sparse
 
-        scores = cosine_similarity(qvec, vec_chunk).flatten()
+        scores = cosine_similarity(qvec_sparse, vec_chunk).flatten()
+
         df_chunk = df_chunk.copy()
         df_chunk["score"] = scores
-        top = df_chunk.sort_values(by="score", ascending=False).head(10)
-        results.append(top)
+        top_chunk = df_chunk.nlargest(10, "score")
+        top_results.append(top_chunk)
 
-    df_all = pd.concat(results, ignore_index=True)
-    return df_all.sort_values(by="score", ascending=False).head(10).to_dict(orient="records")
+    if not top_results:
+        return []
+
+    df_all = pd.concat(top_results, ignore_index=True)
+    return df_all.nlargest(10, "score").to_dict(orient="records")
