@@ -5,7 +5,7 @@ from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
 
-DATA_DIR = "rekomendasi-arxiv/data/data"  # lokasi fix di VPS kamu
+DATA_DIR = "~/rekomendasi-arxiv/data/data"  # lokasi fix di VPS kamu
 
 def load_model():
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
