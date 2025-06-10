@@ -28,7 +28,7 @@ def get_recommendation(text, model):
     top_results = []
 
     for i in range(1, 28):
-        parquet_path = os.path.join(DATA_DIR, f"df_final_part_{i:02d}.parquet")
+        parquet_path = os.path.join(DATA_DIR, "df_final.parquet")
         npz_path = os.path.join(DATA_DIR, f"word2vec_chunk_hybrid_{i:02d}.npz")
 
         if not os.path.exists(parquet_path) or not os.path.exists(npz_path):
