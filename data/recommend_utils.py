@@ -5,7 +5,8 @@ from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
 
-DATA_DIR = "/root/rekomendasi-arxiv/data/data"  # lokasi fix di VPS kamu
+# ✅ Lokasi data tetap
+DATA_DIR = "/root/rekomendasi-arxiv/data/data"
 
 def load_model():
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
@@ -13,7 +14,7 @@ def load_model():
     
     if not os.path.exists(kv_path) or not os.path.exists(npy_path):
         raise FileNotFoundError("❌ Model Word2Vec belum tersedia di VPS. Pastikan file .kv dan .kv.vectors.npy ada.")
-
+    
     print(f"✅ Loading Word2Vec model from {kv_path}")
     return KeyedVectors.load(kv_path)
 
@@ -23,30 +24,28 @@ def get_vector(text, model):
     return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
 
 def get_recommendation(text, model):
-    qvec_dense = get_vector(text, model).reshape(1, -1)
-    qvec_sparse = sparse.csr_matrix(qvec_dense)  # Ubah query ke sparse
-    top_results = []
+    # 👉 Load query vector dan ubah ke bentuk sparse
+    qvec = get_vector(text, model).reshape(1, -1)
+    qvec_sparse = sparse.csr_matrix(qvec)
 
-    for i in range(1, 28):
-        parquet_path = os.path.join(DATA_DIR, "df_final.parquet")
-        npz_path = os.path.join(DATA_DIR, f"word2vec_chunk_hybrid_{i:02d}.npz")
+    # 👉 Path untuk file hasil gabungan
+    df_path = os.path.join(DATA_DIR, "df_combined.parquet")
+    vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
 
-        if not os.path.exists(parquet_path) or not os.path.exists(npz_path):
-            print(f"⚠ Melewati chunk {i:02d}, file tidak ditemukan.")
-            continue
+    # ❗ Validasi file
+    if not os.path.exists(df_path) or not os.path.exists(vec_path):
+        raise FileNotFoundError("❌ df_combined.parquet atau matrix_combined.npz tidak ditemukan di VPS.")
 
-        df_chunk = pd.read_parquet(parquet_path)
-        vec_chunk = sparse.load_npz(npz_path)  # tetap dalam bentuk sparse
+    # 📥 Load semua data hanya sekali
+    print("📥 Load df_combined.parquet dan matrix_combined.npz")
+    df = pd.read_parquet(df_path)
+    matrix = sparse.load_npz(vec_path)  # tetap dalam bentuk sparse!
 
-        scores = cosine_similarity(qvec_sparse, vec_chunk).flatten()
+    # 🔍 Hitung cosine similarity
+    print("🔍 Hitung cosine similarity")
+    scores = cosine_similarity(qvec_sparse, matrix).flatten()
 
-        df_chunk = df_chunk.copy()
-        df_chunk["score"] = scores
-        top_chunk = df_chunk.nlargest(10, "score")
-        top_results.append(top_chunk)
-
-    if not top_results:
-        return []
-
-    df_all = pd.concat(top_results, ignore_index=True)
-    return df_all.nlargest(10, "score").to_dict(orient="records")
+    # 🚀 Ambil top 10 berdasarkan skor tertinggi
+    df = df.copy()
+    df["score"] = scores
+    return df.nlargest(10, "score").to_dict(orient="records")
