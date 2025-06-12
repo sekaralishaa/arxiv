@@ -5,61 +5,83 @@ from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
 
-# ✅ Lokasi data tetap
+# Lokasi file hasil penggabungan
 DATA_DIR = "/root/rekomendasi-arxiv/data/data"
 
+# ===============================
+# Load Word2Vec Model (format .kv)
+# ===============================
 def load_model():
     kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
     npy_path = kv_path + ".vectors.npy"
-    
+
     if not os.path.exists(kv_path) or not os.path.exists(npy_path):
-        raise FileNotFoundError("❌ Model Word2Vec belum tersedia di VPS. Pastikan file .kv dan .kv.vectors.npy ada.")
-    
-    print(f"✅ Loading Word2Vec model from {kv_path}")
+        raise FileNotFoundError("❌ Model Word2Vec tidak ditemukan di VPS.")
+
+    print(f"✅ Load Word2Vec model from {kv_path}")
     return KeyedVectors.load(kv_path)
 
+# ===============================
+# Clean Text (untuk konsistensi)
+# ===============================
+def clean_text(text):
+    import re
+    import string
+    if pd.isna(text):
+        return ""
+    text = re.sub(r"\\$\([^)]*\)\\$", "", text)
+    text = text.replace("\n", " ").replace("-", " ")
+    text = text.translate(str.maketrans("", "", string.punctuation))
+    text = re.sub(r"\\s+", " ", text).strip().lower()
+    return text
+
+# ===============================
+# Get Word2Vec Vector dari input user
+# ===============================
 def get_vector(text, model):
     words = text.lower().split()
-    vectors = [model[w] for w in words if w in model]
-    return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size)
+    vectors = [model[word] for word in words if word in model]
+    return np.mean(vectors, axis=0) if vectors else np.zeros(model.vector_size, dtype=np.float32)
 
-def get_recommendation(text, model):
-    # 👉 Load query vector dan ubah ke bentuk sparse
-    qvec = get_vector(text, model).reshape(1, -1)
-    qvec_sparse = sparse.csr_matrix(qvec)
+# ===============================
+# Main Recommendation Function
+# ===============================
+def recommend_articles(user_title, user_keywords, user_category, model):
+    # Gabungkan & bersihkan input
+    combined_input = clean_text(f"{user_title} {user_keywords.replace(',', ' ')} {user_category}")
+    query_vec = get_vector(combined_input, model).reshape(1, -1)
+    query_vec_sparse = sparse.csr_matrix(query_vec)
 
-    # 👉 Path untuk file hasil gabungan
+    # Path file hasil penggabungan
     df_path = os.path.join(DATA_DIR, "df_combined.parquet")
     vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
 
-    # ❗ Validasi file
     if not os.path.exists(df_path) or not os.path.exists(vec_path):
-        raise FileNotFoundError("❌ df_combined.parquet atau matrix_combined.npz tidak ditemukan di VPS.")
+        raise FileNotFoundError("❌ df_combined.parquet atau matrix_combined.npz tidak ditemukan.")
 
-    # 📥 Load semua data hanya sekali
-    print("📥 Load df_combined.parquet dan matrix_combined.npz")
+    print("📥 Load df_combined & matrix_combined")
     df = pd.read_parquet(df_path)
-    matrix = sparse.load_npz(vec_path)  # tetap dalam bentuk sparse!
+    matrix = sparse.load_npz(vec_path)  # tetap sparse
 
-    # 🔍 Hitung cosine similarity
     print("🔍 Hitung cosine similarity")
-    scores = cosine_similarity(qvec_sparse, matrix).flatten()
-
-    # 🚀 Ambil top 10 berdasarkan skor tertinggi
+    scores = cosine_similarity(query_vec_sparse, matrix).flatten()
     df = df.copy()
-    df["score"] = scores
+    df["similarity_score"] = scores
 
-    # 🔁 Ambil top 10 & ubah semua kolom jadi serializable
-    top10 = df.nlargest(10, "score")
+    # Ambil top 10
+    top10 = df.nlargest(10, "similarity_score")
 
-    # ✅ Pastikan semua value bisa diubah ke JSON
-    top10_serializable = top10.drop(columns=["vector"], errors="ignore").copy()
-    result = top10_serializable.to_dict(orient="records")
+    # Konversi nilai agar JSON-serializable
+    def safe_convert(v):
+        if isinstance(v, (np.generic, np.bool_)):
+            return v.item()
+        elif isinstance(v, np.ndarray):
+            return v.tolist()
+        return v
 
-    # Convert numpy types to native Python
+    result = top10[["title", "authors", "categories_clean", "abstract", "doi", "similarity_score"]].to_dict(orient="records")
     for item in result:
-        for k, v in item.items():
-            if isinstance(v, (np.generic, np.ndarray)):
-                item[k] = v.item() if hasattr(v, 'item') else str(v)
+        for k in item:
+            item[k] = safe_convert(item[k])
 
     return result
