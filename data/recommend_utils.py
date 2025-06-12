@@ -79,7 +79,8 @@ def recommend_articles(user_title, user_keywords, user_category, model):
             return v.tolist()
         return v
 
-    result = top10[["title", "authors", "categories_clean", "abstract", "doi", "similarity_score"]].to_dict(orient="records")
+    result = top10[["title", "authors", "categories_clean", "abstract" "doi", "similarity_score"]].to_dict(orient="records")
+
     for item in result:
         for k in item:
             item[k] = safe_convert(item[k])
