@@ -1,10 +1,9 @@
 import streamlit as st
 import requests
 
-# Page config
 st.set_page_config(page_title="Scientific Article Recommendation System", layout="centered")
 
-# CSS Styling
+# CSS Custom Styling
 st.markdown("""
     <style>
     html, body, .main {
@@ -35,15 +34,11 @@ st.markdown("""
         color: #222B52;
         margin-bottom: 1rem;
     }
-    .stTextInput > div > input {
-        background-color: #F8F7F0 !important;
-        color: #222B52 !important;
-    }
     .submit-container {
         display: flex;
         justify-content: center;
         margin-top: 2rem;
-        margin-bottom: 5rem;
+        margin-bottom: 6rem;
     }
     .stButton > button {
         background-color: #B25640;
@@ -53,14 +48,20 @@ st.markdown("""
         border-radius: 20px;
         border: none;
     }
+    input[type="text"] {
+        background-color: #F8F7F0 !important;
+        border: 1.5px solid #222B52 !important;
+        border-radius: 10px !important;
+        padding: 8px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
 # Top rectangle
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
 
-# Header and rules
-st.markdown('<div class="title">Scientific Paper Recommendation System</div>', unsafe_allow_html=True)
+# Title and rules
+st.markdown('<div class="title">Scientific Article Recommendation System</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Rules</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="description">
@@ -79,14 +80,14 @@ st.markdown("### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
 
 st.markdown("### 📂 Kategori Utama")
-category = st.text_input("Misal: computer science")
+category = st.text_input("Misal: computer science, mathematics")
 
-# Submit button center-aligned
+# Submit button - centered and spacing adjusted
 st.markdown('<div class="submit-container">', unsafe_allow_html=True)
 submit_clicked = st.button("Submit")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Logic
+# Recommendation processing
 if submit_clicked:
     if not any([title, keywords, category]):
         st.warning("⚠️ Harap isi setidaknya satu input.")
