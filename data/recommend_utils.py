@@ -12,14 +12,9 @@ DATA_DIR = "/root/rekomendasi-arxiv/data/data"
 # Load Word2Vec Model (format .kv)
 # ===============================
 def load_model():
-    kv_path = os.path.join(DATA_DIR, "GoogleNews-vectors-reduced.kv")
-    npy_path = kv_path + ".vectors.npy"
-
-    if not os.path.exists(kv_path) or not os.path.exists(npy_path):
-        raise FileNotFoundError("❌ Model Word2Vec tidak ditemukan di VPS.")
-
-    print(f"✅ Load Word2Vec model from {kv_path}")
-    return KeyedVectors.load(kv_path)
+    model_path = os.path.join(DATA_DIR, "GoogleNews-vectors-negative3001.bin")
+    print("📥 Loading Word2Vec model (.bin)")
+    return KeyedVectors.load_word2vec_format(model_path, binary=True)
 
 # ===============================
 # Clean Text (untuk konsistensi)
