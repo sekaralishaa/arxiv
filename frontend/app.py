@@ -1,59 +1,68 @@
 import streamlit as st
 import requests
 
-# ======= Config Layout ========
+# Page config
 st.set_page_config(page_title="Scientific Article Recommendation System", layout="centered")
 
-# ======= Custom CSS ========
+# CSS Styling
 st.markdown("""
     <style>
-    html, body {
-        background-color: #F8F7F0;
-    }
-    .main {
-        font-family: 'Arial';
-    }
-    .title {
+    html, body, .main {
+        background-color: #F8F7F0 !important;
+        font-family: 'Arial', sans-serif;
         color: #222B52;
-        font-size: 36px;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .subtitle {
-        color: #222B52;
-        font-size: 24px;
-        font-weight: 600;
-    }
-    .description {
-        color: #222B52;
-        font-size: 16px;
-        margin-bottom: 1rem;
     }
     .rectangle {
         width: 100vw;
         height: 60px;
         background-color: #B25640;
-        margin-bottom: 2rem;
+        position: relative;
+        left: -8vw;
+    }
+    .title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #222B52;
+        margin-bottom: 0.3rem;
+    }
+    .subtitle {
+        font-size: 22px;
+        font-weight: 600;
+        color: #222B52;
+        margin-top: 1.2rem;
+    }
+    .description {
+        font-size: 15px;
+        color: #222B52;
+        margin-bottom: 1rem;
     }
     .stTextInput > div > input {
         background-color: #F8F7F0 !important;
         color: #222B52 !important;
     }
-    .custom-button button {
-        background-color: #B25640 !important;
-        color: #F8F7F0 !important;
-        border-radius: 20px !important;
-        padding: 0.5rem 1.5rem;
+    .submit-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        margin-bottom: 5rem;
+    }
+    .stButton > button {
+        background-color: #B25640;
+        color: #F8F7F0;
         font-weight: bold;
+        padding: 0.5rem 2rem;
+        border-radius: 20px;
+        border: none;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ======= UI ========
+# Top rectangle
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
-st.markdown('<div class="title">Scientific Paper Recommendation System</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Aturan</div>', unsafe_allow_html=True)
 
+# Header and rules
+st.markdown('<div class="title">Scientific Paper Recommendation System</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Rules</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="description">
     <ol>
@@ -63,7 +72,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ======= Input Fields ========
+# Input fields
 st.markdown("### 📝 Judul Artikel")
 title = st.text_input("Misal: scientific paper recommender system using deep learning and link prediction in citation network")
 
@@ -71,11 +80,15 @@ st.markdown("### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
 
 st.markdown("### 📂 Kategori Utama")
-category = st.text_input("Misal: computer science, mathematics")
+category = st.text_input("Misal: computer science")
 
-# ======= Submit Button ========
-st.markdown('<div class="custom-button" style="text-align: center;">', unsafe_allow_html=True)
-if st.button("Submit"):
+# Submit button center-aligned
+st.markdown('<div class="submit-container">', unsafe_allow_html=True)
+submit_clicked = st.button("Submit")
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Logic
+if submit_clicked:
     if not any([title, keywords, category]):
         st.warning("⚠️ Harap isi setidaknya satu input.")
     else:
@@ -96,7 +109,6 @@ if st.button("Submit"):
                 st.text(response.text)
         except Exception as e:
             st.error(f"❌ Error: {e}")
-st.markdown('</div>', unsafe_allow_html=True)
 
-# ======= Bottom Rectangle ========
+# Bottom rectangle
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
