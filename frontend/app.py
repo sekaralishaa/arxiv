@@ -1,15 +1,14 @@
-
 import streamlit as st
 import requests
 
-# ======= Global Config ========
+# ======= Config Layout ========
 st.set_page_config(page_title="Scientific Article Recommendation System", layout="centered")
 
-# ======= Custom Style ========
+# ======= Custom CSS ========
 st.markdown("""
     <style>
     html, body {
-        background-color: #FAF9F6;
+        background-color: #F8F7F0;
     }
     .main {
         font-family: 'Arial';
@@ -31,21 +30,26 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .rectangle {
-        width: 100%;
+        width: 100vw;
         height: 60px;
         background-color: #B25640;
-        margin: 0 auto 2rem auto;
+        margin-bottom: 2rem;
     }
-    .button-style button {
+    .stTextInput > div > input {
+        background-color: #F8F7F0 !important;
+        color: #222B52 !important;
+    }
+    .custom-button button {
         background-color: #B25640 !important;
-        color: white !important;
-        border-radius: 20px;
+        color: #F8F7F0 !important;
+        border-radius: 20px !important;
+        padding: 0.5rem 1.5rem;
         font-weight: bold;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ======= Layout ========
+# ======= UI ========
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
 st.markdown('<div class="title">Scientific Paper Recommendation System</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Aturan</div>', unsafe_allow_html=True)
@@ -61,40 +65,38 @@ st.markdown("""
 
 # ======= Input Fields ========
 st.markdown("### 📝 Judul Artikel")
-title = st.text_input("Misal: scientific paper recommender system using deep learning and link prediction in citation network", key="title")
+title = st.text_input("Misal: scientific paper recommender system using deep learning and link prediction in citation network")
 
 st.markdown("### 🔑 Keyword (pisahkan dengan koma)")
-keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system", key="keywords")
+keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
 
 st.markdown("### 📂 Kategori Utama")
-category = st.text_input("Misal: computer science, mathematics", key="category")
+category = st.text_input("Misal: computer science, mathematics")
 
 # ======= Submit Button ========
-with st.container():
-    st.markdown('<div style="text-align: center;" class="button-style">', unsafe_allow_html=True)
-    if st.button("Submit"):
-        if not any([title, keywords, category]):
-            st.warning("⚠️ Harap isi setidaknya satu input.")
-        else:
-            payload = {
-                "title": title,
-                "keywords": keywords,
-                "category": category
-            }
-            try:
-                with st.spinner("⏳ Mengirim ke server..."):
-                    response = requests.post("http://localhost:5000/recommend", json=payload)
-                    
-                if response.ok:
-                    result = response.json()
-                    st.success("✅ Rekomendasi ditemukan!")
-                    st.dataframe(result)
-                    st.caption(f"Status: {response.status_code}")
-                else:
-                    st.error(f"❌ Gagal mengambil rekomendasi (status {response.status_code})")
-                    st.text(response.text)
-            except Exception as e:
-                st.error(f"❌ Error: {e}")
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<div class="custom-button" style="text-align: center;">', unsafe_allow_html=True)
+if st.button("Submit"):
+    if not any([title, keywords, category]):
+        st.warning("⚠️ Harap isi setidaknya satu input.")
+    else:
+        try:
+            with st.spinner("⏳ Mengirim ke server..."):
+                response = requests.post("http://localhost:5000/recommend", json={
+                    "title": title,
+                    "keywords": keywords,
+                    "category": category
+                })
+            if response.ok:
+                result = response.json()
+                st.success("✅ Rekomendasi ditemukan!")
+                st.dataframe(result)
+                st.caption(f"Status: {response.status_code}")
+            else:
+                st.error(f"❌ Gagal mengambil rekomendasi (status {response.status_code})")
+                st.text(response.text)
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
+st.markdown('</div>', unsafe_allow_html=True)
 
+# ======= Bottom Rectangle ========
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
