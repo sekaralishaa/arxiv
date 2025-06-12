@@ -45,7 +45,7 @@ def recommend_articles(user_title, user_keywords, user_category, model):
     # Gabungkan & bersihkan input
     combined_input = clean_text(f"{user_title} {user_keywords.replace(',', ' ')} {user_category}")
     query_vec = get_vector(combined_input, model).reshape(1, -1)
-    query_vec_sparse = sparse.csr_matrix(query_vec)
+    # query_vec_sparse = sparse.csr_matrix(query_vec)
 
     # Path file hasil penggabungan
     df_path = os.path.join(DATA_DIR, "df_combined.parquet")
@@ -59,7 +59,7 @@ def recommend_articles(user_title, user_keywords, user_category, model):
     matrix = sparse.load_npz(vec_path)  # tetap sparse
 
     print("🔍 Hitung cosine similarity")
-    scores = cosine_similarity(query_vec_sparse, matrix).flatten()
+    scores = cosine_similarity(query_vec, matrix).flatten()
     df = df.copy()
     df["similarity_score"] = scores
 
