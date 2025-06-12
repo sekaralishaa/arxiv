@@ -44,15 +44,17 @@ st.markdown("""
         background-color: #B25640;
         color: #F8F7F0;
         font-weight: bold;
-        padding: 0.5rem 2rem;
-        border-radius: 20px;
+        padding: 0.6rem 2rem;
+        border-radius: 25px;
         border: none;
+        margin-top: 1rem;
     }
     input[type="text"] {
-        background-color: #F8F7F0 !important;
+        background-color: transparent !important;
         border: 1.5px solid #222B52 !important;
         border-radius: 10px !important;
         padding: 8px !important;
+        color: #222B52 !important; 
     }
     </style>
 """, unsafe_allow_html=True)
@@ -83,9 +85,10 @@ st.markdown("### 📂 Kategori Utama")
 category = st.text_input("Misal: computer science, mathematics")
 
 # Submit button - centered and spacing adjusted
-st.markdown('<div class="submit-container">', unsafe_allow_html=True)
-submit_clicked = st.button("Submit")
-st.markdown('</div>', unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns([2, 1, 2])
+with col2:
+    submit_clicked = st.button("Submit")
 
 # Recommendation processing
 if submit_clicked:
