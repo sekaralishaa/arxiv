@@ -13,11 +13,10 @@ st.markdown("""
         color: #222B52;
     }
     .rectangle {
-        width: 100vw;
+        width: 100%;
         height: 60px;
         background-color: #B25640;
-        position: relative;
-        left: -8vw;
+        margin: 0 auto 2rem auto;
     }
     .title {
         font-size: 36px;
