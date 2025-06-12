@@ -48,4 +48,18 @@ def get_recommendation(text, model):
     # 🚀 Ambil top 10 berdasarkan skor tertinggi
     df = df.copy()
     df["score"] = scores
-    return df.nlargest(10, "score").to_dict(orient="records")
+
+    # 🔁 Ambil top 10 & ubah semua kolom jadi serializable
+    top10 = df.nlargest(10, "score")
+
+    # ✅ Pastikan semua value bisa diubah ke JSON
+    top10_serializable = top10.drop(columns=["vector"], errors="ignore").copy()
+    result = top10_serializable.to_dict(orient="records")
+
+    # Convert numpy types to native Python
+    for item in result:
+        for k, v in item.items():
+            if isinstance(v, (np.generic, np.ndarray)):
+                item[k] = v.item() if hasattr(v, 'item') else str(v)
+
+    return result
