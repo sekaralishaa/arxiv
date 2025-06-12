@@ -56,8 +56,25 @@ st.markdown("""
         padding: 8px !important;
         color: #222B52 !important; 
     }
+
+    /* ✅ Tambahan untuk tabel hasil */
+    thead tr th {
+        color: #222B52 !important;
+        font-weight: bold !important;
+        border: 1px solid #222B52 !important;
+        background-color: #F8F7F0 !important;
+    }
+    tbody tr td {
+        color: #222B52 !important;
+        border: 1px solid #222B52 !important;
+        background-color: #F8F7F0 !important;
+    }
+    .stDataFrame {
+        background-color: #F8F7F0 !important;
+    }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Top rectangle
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
