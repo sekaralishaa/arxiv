@@ -48,7 +48,7 @@ def recommend_articles(user_title, user_keywords, user_category, model):
     query_vec_sparse = sparse.csr_matrix(query_vec)
 
     # Path file hasil penggabungan
-    df_path = os.path.join(DATA_DIR, "df_final.parquet")
+    df_path = os.path.join(DATA_DIR, "df_combined.parquet")
     vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
 
     if not os.path.exists(df_path) or not os.path.exists(vec_path):
