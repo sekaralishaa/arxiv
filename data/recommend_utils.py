@@ -46,7 +46,7 @@ def get_vector(text, model):
 # ===============================
 # Main Recommendation Function
 # ===============================
-def recommend_articles(user_title, user_keywords, user_category, model):
+def get_recommendation(user_title, user_keywords, user_category, model):
     # Gabungkan & bersihkan input
     combined_input = clean_text(f"{user_title} {user_keywords.replace(',', ' ')} {user_category}")
     query_vec = get_vector(combined_input, model).reshape(1, -1)
