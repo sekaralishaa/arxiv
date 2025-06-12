@@ -41,13 +41,11 @@ def get_vector(text, model):
 # ===============================
 # Main Recommendation Function
 # ===============================
-def recommend_articles(user_title, user_keywords, user_category, model):
+def recommend_articles(user_title, user_keywords, user_category, model, chunk_size=100000):
     # Gabungkan & bersihkan input
     combined_input = clean_text(f"{user_title} {user_keywords.replace(',', ' ')} {user_category}")
     query_vec = get_vector(combined_input, model).reshape(1, -1)
-    # query_vec_sparse = sparse.csr_matrix(query_vec)
 
-    # Path file hasil penggabungan
     df_path = os.path.join(DATA_DIR, "df_combined.parquet")
     vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
 
@@ -56,15 +54,25 @@ def recommend_articles(user_title, user_keywords, user_category, model):
 
     print("📥 Load df_combined & matrix_combined")
     df = pd.read_parquet(df_path)
-    matrix = sparse.load_npz(vec_path)  # tetap sparse
+    matrix = sparse.load_npz(vec_path)
 
-    print("🔍 Hitung cosine similarity")
-    scores = cosine_similarity(query_vec, matrix).flatten()
-    df = df.copy()
-    df["similarity_score"] = scores
+    print("🔍 Hitung cosine similarity per chunk")
+    all_scores = []
+    all_indexes = []
 
-    # Ambil top 10
-    top10 = df.nlargest(10, "similarity_score")
+    start_idx = 0
+    while start_idx < matrix.shape[0]:
+        end_idx = min(start_idx + chunk_size, matrix.shape[0])
+        chunk = matrix[start_idx:end_idx]
+        sim = cosine_similarity(query_vec, chunk).flatten()
+        all_scores.extend(sim)
+        all_indexes.extend(range(start_idx, end_idx))
+        start_idx = end_idx
+
+    print("✅ Gabungkan dan sortir hasil")
+    df_chunked = df.iloc[all_indexes].copy()
+    df_chunked["similarity_score"] = all_scores
+    top10 = df_chunked.nlargest(10, "similarity_score")
 
     # Konversi nilai agar JSON-serializable
     def safe_convert(v):
@@ -81,3 +89,4 @@ def recommend_articles(user_title, user_keywords, user_category, model):
             item[k] = safe_convert(item[k])
 
     return result
+
