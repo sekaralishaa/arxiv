@@ -100,7 +100,7 @@ st.markdown("#### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
 
 st.markdown("#### 📂 Kategori Utama")
-category = st.text_input("Misal: computer science, mathematics")
+category = st.text_input("Misal: computer science")
 
 # Submit button - centered and spacing adjusted
 
