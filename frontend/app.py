@@ -18,7 +18,7 @@ st.markdown("""
         margin: 0 auto 2rem auto;
     }
     .title {
-        font-size: 26px;
+        font-size: 36px;
         font-weight: bold;
         color: #222B52;
         margin-bottom: 0.3rem;
@@ -92,13 +92,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Input fields
-st.markdown("### 📝 Judul Artikel")
+st.markdown("#### 📝 Judul Artikel")
 title = st.text_input("Misal: scientific paper recommender system using deep learning and link prediction in citation network")
 
-st.markdown("### 🔑 Keyword (pisahkan dengan koma)")
+st.markdown("#### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
 
-st.markdown("### 📂 Kategori Utama")
+st.markdown("#### 📂 Kategori Utama")
 category = st.text_input("Misal: computer science, mathematics")
 
 # Submit button - centered and spacing adjusted
@@ -121,8 +121,9 @@ if submit_clicked:
                 })
             if response.ok:
                 result = response.json()
+                df_result = pd.DataFrame(result)[["title", "authors", "categories_clean", "abstract", "doi", "similarity_score"]]
                 st.success("✅ Rekomendasi ditemukan!")
-                st.dataframe(result)
+                st.dataframe(df_result)
                 st.caption(f"Status: {response.status_code}")
             else:
                 st.error(f"❌ Gagal mengambil rekomendasi (status {response.status_code})")
