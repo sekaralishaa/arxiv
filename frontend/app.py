@@ -109,6 +109,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
 # Rules
 st.markdown('<div class="subtitle">Rules</div>', unsafe_allow_html=True)
 st.markdown("""
