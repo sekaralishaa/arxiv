@@ -88,6 +88,9 @@ st.markdown("""
 st.markdown('<div class="header-banner">Scientific Article Recommendation System</div>', unsafe_allow_html=True)
 
 # Penjelasan sistem
+st.markdown('<div class="subtitle">Tentang Aplikasi</div>', unsafe_allow_html=True)
+
+
 st.markdown(
     """
 <div class="description">
