@@ -117,8 +117,8 @@ Sistem rekomendasi ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>M
 
 # Input fields
 st.markdown("#### 📝 Judul Artikel")
-title = st.text_input("Masukkan judul lengkap atau kata kunci utama dari artikel")
-st.caption("Contoh: *Image Classification Using Deep Neural Network*")
+title = st.text_input("Masukkan judul lengkap atau kata kunci utama dari artikel (Contoh:Image Classification Using Deep Neural Network")
+# st.caption("Contoh: *Image Classification Using Deep Neural Network*")
 
 st.markdown("#### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Contoh: recommendation system, text processing, machine learning")
