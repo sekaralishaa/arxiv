@@ -114,7 +114,7 @@ if submit_clicked:
         st.warning("⚠️ Harap isi setidaknya satu input.")
     else:
         try:
-            with st.spinner("⏳ Mengirim ke server..."):
+            with st.spinner("⏳ Mengirim ke server... mohon menunggu, kira-kira hasil akan keluar setelah 1 menit 😁 "):
                 response = requests.post("http://localhost:5000/recommend", json={
                     "title": title,
                     "keywords": keywords,
