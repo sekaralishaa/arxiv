@@ -12,11 +12,19 @@ st.markdown("""
         font-family: 'Arial', sans-serif;
         color: #222B52;
     }
-    .rectangle {
+    .header-banner {
         width: 100%;
-        height: 60px;
-        background-color: #B25640;
-        margin: 0 auto 2rem auto;
+        height: 80px;
+        background: linear-gradient(to right, #B25640, #DE805C);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 26px;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        letter-spacing: 1px;
     }
     .title {
         font-size: 36px;
@@ -76,12 +84,32 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Header banner
+st.markdown('<div class="header-banner">Scientific Article Recommendation System</div>', unsafe_allow_html=True)
 
-# Top rectangle
-st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
+# Penjelasan sistem
+st.markdown('<div class="subtitle">Tentang Aplikasi</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="description">
+    Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang relevan berdasarkan <b>judul artikel</b>, <b>keyword</b>, dan <b>kategori utama</b> yang dimasukkan oleh pengguna. 
+    Sistem ini sangat bermanfaat bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
 
-# Title and rules
-st.markdown('<div class="title">Scientific Article Recommendation System</div>', unsafe_allow_html=True)
+    <br><br>
+    Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
+    Fitur teks diproses menggunakan teknik <b>TF-IDF dan Word2Vec</b> untuk merepresentasikan konten secara numerik.
+
+    <br><br>
+    <b>Instruksi:</b>
+    <ol>
+        <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap akan memberikan hasil lebih akurat, tetapi kamu juga bisa memasukkan bagian dari judul atau kata kunci utama.</li>
+        <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misalnya: <i>recommendation system, machine learning</i>.</li>
+        <li>Masukkan kategori utama artikel, seperti: <i>computer science</i>, <i>mathematics</i>, atau lainnya sesuai bidang.</li>
+        <li>Klik tombol <b>Submit</b>, dan sistem akan menampilkan artikel yang paling relevan berdasarkan input kamu.</li>
+    </ol>
+</div>
+""", unsafe_allow_html=True)
+
+# Rules
 st.markdown('<div class="subtitle">Rules</div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="description">
@@ -94,16 +122,28 @@ st.markdown("""
 
 # Input fields
 st.markdown("#### 📝 Judul Artikel")
-title = st.text_input("Misal: scientific paper recommender system using deep learning and link prediction in citation network")
+title = st.text_input("Masukkan judul lengkap atau kata kunci utama dari artikel")
 
 st.markdown("#### 🔑 Keyword (pisahkan dengan koma)")
-keywords = st.text_input("Misal: recommendation system, text processing, content based recommendation system")
+keywords = st.text_input("Contoh: recommendation system, text processing, machine learning")
 
 st.markdown("#### 📂 Kategori Utama")
-category = st.text_input("Misal: computer science")
+category = st.selectbox(
+    "Pilih kategori utama artikel",
+    [
+        "physics",
+        "mathematics",
+        "computer science",
+        "quantitative biology",
+        "quantitative finance",
+        "statistics",
+        "electrical engineering and systems science",
+        "economics"
+    ]
+)
 
-# Submit button - centered and spacing adjusted
 
+# Submit button
 col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
     submit_clicked = st.button("Submit")
@@ -114,7 +154,7 @@ if submit_clicked:
         st.warning("⚠️ Harap isi setidaknya satu input.")
     else:
         try:
-            with st.spinner("⏳ Mengirim ke server... mohon menunggu, kira-kira hasil akan keluar setelah 1 menit 😁 "):
+            with st.spinner("⏳ Mengirim ke server... mohon menunggu, kira-kira hasil akan keluar setelah 1 menit 😁"):
                 response = requests.post("http://localhost:5000/recommend", json={
                     "title": title,
                     "keywords": keywords,
@@ -125,7 +165,6 @@ if submit_clicked:
                 df_result = pd.DataFrame(result)[["title", "authors", "categories", "abstract", "doi", "similarity_score"]]
                 st.success("✅ Rekomendasi ditemukan!")
                 st.dataframe(df_result)
-                st.caption(f"Status: {response.status_code}")
             else:
                 st.error(f"❌ Gagal mengambil rekomendasi (status {response.status_code})")
                 st.text(response.text)
