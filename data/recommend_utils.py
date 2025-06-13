@@ -49,7 +49,7 @@ def recommend_articles(user_title, user_keywords, user_category, model, chunk_si
     print("🔍 Vektor input preview:", query_vec[0][:10])  # 10 angka awal
     print("🔍 Mean:", np.mean(query_vec), "| Max:", np.max(query_vec), "| Min:", np.min(query_vec))
 
-    df_path = os.path.join(DATA_DIR, "df_combined.parquet")
+    df_path = os.path.join(DATA_DIR, "df_final_new.parquet")
     vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
 
     if not os.path.exists(df_path) or not os.path.exists(vec_path):
