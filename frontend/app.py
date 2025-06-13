@@ -88,26 +88,27 @@ st.markdown("""
 st.markdown('<div class="header-banner">Scientific Article Recommendation System</div>', unsafe_allow_html=True)
 
 # Penjelasan sistem
-st.markdown('<div class="subtitle">Tentang Aplikasi</div>', unsafe_allow_html=True)
-st.markdown("""
+st.markdown(
+    """
 <div class="description">
-    Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang relevan berdasarkan <b>judul artikel</b>, <b>keyword</b>, dan <b>kategori utama</b> yang dimasukkan oleh pengguna. 
-    Sistem ini sangat bermanfaat bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
-
-    <br><br>
-    Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
-    Fitur teks diproses menggunakan teknik <b>TF-IDF dan Word2Vec</b> untuk merepresentasikan konten secara numerik.
-
-    <br><br>
-    <b>Instruksi:</b>
-    <ol>
-        <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap akan memberikan hasil lebih akurat, tetapi kamu juga bisa memasukkan bagian dari judul atau kata kunci utama.</li>
-        <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misalnya: <i>recommendation system, machine learning</i>.</li>
-        <li>Masukkan kategori utama artikel, seperti: <i>computer science</i>, <i>mathematics</i>, atau lainnya sesuai bidang.</li>
-        <li>Klik tombol <b>Submit</b>, dan sistem akan menampilkan artikel yang paling relevan berdasarkan input kamu.</li>
-    </ol>
+Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang relevan berdasarkan <b>judul artikel</b>, <b>keyword</b>, dan <b>kategori utama</b> yang dimasukkan oleh pengguna. 
+Sistem ini sangat bermanfaat bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
+<br><br>
+Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
+Fitur teks diproses menggunakan teknik <b>TF-IDF dan Word2Vec</b> untuk merepresentasikan konten secara numerik.
+<br><br>
+<b>Instruksi:</b>
+<ol>
+    <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap akan memberikan hasil lebih akurat, tetapi kamu juga bisa memasukkan bagian dari judul atau kata kunci utama.</li>
+    <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misalnya: <i>recommendation system, machine learning</i>.</li>
+    <li>Masukkan kategori utama artikel, seperti: <i>computer science</i>, <i>mathematics</i>, atau lainnya sesuai bidang.</li>
+    <li>Klik tombol <b>Submit</b>, dan sistem akan menampilkan artikel yang paling relevan berdasarkan input kamu.</li>
+</ol>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True
+)
+
 
 
 # Rules
