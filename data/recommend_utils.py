@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+import re
+import string
 from gensim.models import KeyedVectors
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
@@ -20,8 +22,6 @@ def load_model():
 # Clean Text (untuk konsistensi)
 # ===============================
 def clean_text(text):
-    import re
-    import string
     if pd.isna(text):
         return ""
     text = re.sub(r"\\$\([^)]*\)\\$", "", text)
@@ -45,6 +45,9 @@ def recommend_articles(user_title, user_keywords, user_category, model, chunk_si
     # Gabungkan & bersihkan input
     combined_input = clean_text(f"{user_title} {user_keywords.replace(',', ' ')} {user_category}")
     query_vec = get_vector(combined_input, model).reshape(1, -1)
+    print("🔍 Vektor input shape:", query_vec.shape)
+    print("🔍 Vektor input preview:", query_vec[0][:10])  # 10 angka awal
+    print("🔍 Mean:", np.mean(query_vec), "| Max:", np.max(query_vec), "| Min:", np.min(query_vec))
 
     df_path = os.path.join(DATA_DIR, "df_combined.parquet")
     vec_path = os.path.join(DATA_DIR, "matrix_combined.npz")
