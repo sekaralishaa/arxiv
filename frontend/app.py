@@ -122,7 +122,7 @@ if submit_clicked:
                 })
             if response.ok:
                 result = response.json()
-                df_result = pd.DataFrame(result)[["title", "authors", "categories_clean", "abstract", "doi", "similarity_score"]]
+                df_result = pd.DataFrame(result)[["title", "authors", "categories", "abstract", "doi", "similarity_score"]]
                 st.success("✅ Rekomendasi ditemukan!")
                 st.dataframe(df_result)
                 st.caption(f"Status: {response.status_code}")
