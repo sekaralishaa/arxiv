@@ -76,6 +76,8 @@ def recommend_articles(user_title, user_keywords, user_category, model, chunk_si
     df_chunked = df.iloc[all_indexes].copy()
     df_chunked["similarity_score"] = all_scores
     top10 = df_chunked.nlargest(10, "similarity_score")
+    top10 = top10.rename(columns={"categories_clean": "categories"})
+
 
     # Konversi nilai agar JSON-serializable
     def safe_convert(v):
@@ -85,7 +87,7 @@ def recommend_articles(user_title, user_keywords, user_category, model, chunk_si
             return v.tolist()
         return v
 
-    result = top10[["title", "authors", "categories_clean", "abstract", "doi", "similarity_score"]].to_dict(orient="records")
+    result = top10[["title", "authors", "categories", "abstract", "doi", "similarity_score"]].to_dict(orient="records")
 
     for item in result:
         for k in item:
