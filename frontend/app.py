@@ -95,35 +95,25 @@ st.markdown(
     """
 <div class="description">
 Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang relevan berdasarkan <b>judul artikel</b>, <b>keyword</b>, dan <b>kategori utama</b> yang dimasukkan oleh pengguna. 
-Sistem ini sangat bermanfaat bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
+Sistem ini sangat ditujukan bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
 <br><br>
 Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
-Fitur teks diproses menggunakan teknik <b>TF-IDF dan Word2Vec</b> untuk merepresentasikan konten secara numerik.
+Fitur teks diproses menggunakan teknik <b>Word2Vec</b> untuk merepresentasikan konten secara numerik.
+<br><br>
+Sistem rekomendasi ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>Matematika</b>, <b>Ilmu Komputer</b>, <b>Biologi Kuantitatif</b>, <b>Keuangan Kuantitatif</b>, <b>Statistika</b>, <b>Teknik Elektro dan Ilmu Sistem</b>, dan <b>Ekonomi</b> mengacu pada data ArXiv.
 <br><br>
 <b>Instruksi:</b>
 <ol>
+    <li>Mohon masukkan input dengan bahasa Inggris dan pastikan input benar serta tidak ada typo.</li>
     <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap akan memberikan hasil lebih akurat, tetapi kamu juga bisa memasukkan bagian dari judul atau kata kunci utama.</li>
     <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misalnya: <i>recommendation system, machine learning</i>.</li>
-    <li>Masukkan kategori utama artikel, seperti: <i>computer science</i>, <i>mathematics</i>, atau lainnya sesuai bidang.</li>
+    <li>Pilih salah satu kategori utama artikel yang tersedia.</li>
     <li>Klik tombol <b>Submit</b>, dan sistem akan menampilkan artikel yang paling relevan berdasarkan input kamu.</li>
 </ol>
 </div>
 """,
     unsafe_allow_html=True
 )
-
-
-
-# Rules
-st.markdown('<div class="subtitle">Rules</div>', unsafe_allow_html=True)
-st.markdown("""
-<div class="description">
-    <ol>
-        <li>Mohon masukkan input dengan bahasa Inggris dan pastikan input benar serta tidak ada typo.</li>
-        <li>Sistem rekomendasi ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>Matematika</b>, <b>Ilmu Komputer</b>, <b>Biologi Kuantitatif</b>, <b>Keuangan Kuantitatif</b>, <b>Statistika</b>, <b>Teknik Elektro dan Ilmu Sistem</b>, dan <b>Ekonomi</b>.</li>
-    </ol>
-</div>
-""", unsafe_allow_html=True)
 
 # Input fields
 st.markdown("#### 📝 Judul Artikel")
