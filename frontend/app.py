@@ -26,6 +26,12 @@ st.markdown("""
         border-radius: 8px;
         letter-spacing: 1px;
     }
+    .title {
+        font-size: 36px;
+        font-weight: bold;
+        color: #222B52;
+        margin-bottom: 0.3rem;
+    }
     .subtitle {
         font-size: 22px;
         font-weight: 600;
@@ -36,6 +42,12 @@ st.markdown("""
         font-size: 15px;
         color: #222B52;
         margin-bottom: 1rem;
+    }
+    .submit-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        margin-bottom: 6rem;
     }
     .stButton > button {
         background-color: #B25640;
@@ -53,13 +65,8 @@ st.markdown("""
         padding: 8px !important;
         color: #222B52 !important; 
     }
-    .input-container {
-        background-color: #ffffff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        margin-top: 2rem;
-    }
+
+    /* ✅ Tambahan untuk tabel hasil */
     thead tr th {
         color: #222B52 !important;
         font-weight: bold !important;
@@ -83,6 +90,7 @@ st.markdown('<div class="header-banner">Scientific Article Recommendation System
 # Penjelasan sistem
 st.markdown('<div class="subtitle">Tentang Aplikasi</div>', unsafe_allow_html=True)
 
+
 st.markdown(
     """
 <div class="description">
@@ -90,28 +98,27 @@ Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang rel
 Sistem ini ditujukan bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
 <br><br>
 Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
-ArXiv sendiri adalah repositori digital terbuka yang menyediakan akses gratis ke artikel ilmiah. Fitur teks diproses menggunakan teknik <b>Word2Vec</b> untuk merepresentasikan konten secara numerik.
+ArXiv sendiri adalah sebuah repositori digital terbuka yang menyimpan dan menyediakan akses gratis ke artikel ilmiah.Fitur teks diproses menggunakan teknik <b>Word2Vec</b> untuk merepresentasikan konten secara numerik.
 <br><br>
-Sistem ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>Matematika</b>, <b>Ilmu Komputer</b>, <b>Biologi Kuantitatif</b>, <b>Keuangan Kuantitatif</b>, <b>Statistika</b>, <b>Teknik Elektro dan Ilmu Sistem</b>, dan <b>Ekonomi</b> sesuai data ArXiv.
+Sistem rekomendasi ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>Matematika</b>, <b>Ilmu Komputer</b>, <b>Biologi Kuantitatif</b>, <b>Keuangan Kuantitatif</b>, <b>Statistika</b>, <b>Teknik Elektro dan Ilmu Sistem</b>, dan <b>Ekonomi</b> mengacu pada data ArXiv.
 <br><br>
 <b>Instruksi:</b>
 <ol>
-    <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap lebih akurat, tapi kamu bisa pakai kata kunci.</li>
-    <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misal: <i>recommendation system, machine learning</i>.</li>
+    <li>Mohon masukkan input dengan bahasa Inggris dan pastikan input benar serta tidak ada typo.</li>
+    <li>Masukkan judul artikel yang ingin kamu cari. Judul lengkap akan memberikan hasil lebih akurat, tetapi kamu juga bisa memasukkan bagian dari judul atau kata kunci utama.</li>
+    <li>Masukkan keyword yang relevan, dipisahkan dengan koma. Misalnya: <i>recommendation system, machine learning</i>.</li>
     <li>Pilih salah satu kategori utama artikel yang tersedia.</li>
-    <li>Klik tombol <b>Submit</b> untuk melihat hasil rekomendasi artikel.</li>
+    <li>Klik tombol <b>Submit</b>, dan sistem akan menampilkan artikel yang paling relevan berdasarkan input kamu.</li>
 </ol>
 </div>
 """,
     unsafe_allow_html=True
 )
 
-# Input form
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
-
+# Input fields
 st.markdown("#### 📝 Judul Artikel")
-title = st.text_input("Masukkan judul lengkap atau kata kunci utama dari artikel")
-st.caption("Contoh: Image Classification Using Deep Neural Network")
+title = st.text_input("Masukkan judul lengkap atau kata kunci utama dari artikel (contoh:Image Classification Using Deep Neural Network)")
+# st.caption("Contoh: *Image Classification Using Deep Neural Network*")
 
 st.markdown("#### 🔑 Keyword (pisahkan dengan koma)")
 keywords = st.text_input("Contoh: recommendation system, text processing, machine learning")
@@ -131,13 +138,13 @@ category = st.selectbox(
     ]
 )
 
+
+# Submit button
 col1, col2, col3 = st.columns([2, 1, 2])
 with col2:
     submit_clicked = st.button("Submit")
 
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Proses rekomendasi
+# Recommendation processing
 if submit_clicked:
     if not any([title, keywords, category]):
         st.warning("⚠️ Harap isi setidaknya satu input.")
@@ -160,5 +167,5 @@ if submit_clicked:
         except Exception as e:
             st.error(f"❌ Error: {e}")
 
-# Footer rectangle
+# Bottom rectangle
 st.markdown('<div class="rectangle"></div>', unsafe_allow_html=True)
