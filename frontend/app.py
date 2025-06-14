@@ -2,7 +2,8 @@ import streamlit as st
 import requests
 import pandas as pd
 
-st.set\_page\_config(page\_title="Scientific Article Recommendation System", layout="centered")
+st.set_page_config(page_title="Scientific Article Recommendation System", layout="centered")
+
 
 # CSS Custom Styling
 
