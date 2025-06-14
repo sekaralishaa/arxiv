@@ -95,10 +95,10 @@ st.markdown(
     """
 <div class="description">
 Aplikasi ini bertujuan untuk membantu pengguna menemukan artikel ilmiah yang relevan berdasarkan <b>judul artikel</b>, <b>keyword</b>, dan <b>kategori utama</b> yang dimasukkan oleh pengguna. 
-Sistem ini sangat ditujukan bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
+Sistem ini ditujukan bagi mahasiswa, peneliti, dan praktisi untuk mempercepat proses pencarian referensi berkualitas dalam berbagai bidang sains dan teknologi.
 <br><br>
 Proses rekomendasi dilakukan dengan menggunakan pendekatan <b>Content-Based Filtering</b>, di mana sistem menghitung kemiripan antara input pengguna dan kumpulan artikel ilmiah dari basis data ArXiv. 
-Fitur teks diproses menggunakan teknik <b>Word2Vec</b> untuk merepresentasikan konten secara numerik.
+ArXiv sendiri adalah sebuah repositori digital terbuka yang menyimpan dan menyediakan akses gratis ke artikel ilmiah.Fitur teks diproses menggunakan teknik <b>Word2Vec</b> untuk merepresentasikan konten secara numerik.
 <br><br>
 Sistem rekomendasi ini hanya menyajikan artikel dalam bidang <b>Fisika</b>, <b>Matematika</b>, <b>Ilmu Komputer</b>, <b>Biologi Kuantitatif</b>, <b>Keuangan Kuantitatif</b>, <b>Statistika</b>, <b>Teknik Elektro dan Ilmu Sistem</b>, dan <b>Ekonomi</b> mengacu pada data ArXiv.
 <br><br>
